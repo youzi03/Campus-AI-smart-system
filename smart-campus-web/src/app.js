@@ -77,23 +77,57 @@ const App = {
     const currentTitle = ref('首页');
     const now = ref(Common.today());
 
-    const stats = computed(() => ({
-      studentCount: (UserService && UserService.studentCount) ? UserService.studentCount() : 0,
-      teacherCount: (UserService && UserService.teacherCount) ? UserService.teacherCount() : 0,
-      courseCount: (CourseService && CourseService.courseCount) ? CourseService.courseCount() : 0,
-      scoreCount: (ScoreService && ScoreService.scoreCount) ? ScoreService.scoreCount() : 0,
-      noticeCount: (NoticeService && NoticeService.noticeCount) ? NoticeService.noticeCount() : 0,
-      roomCount: (DormService && DormService.roomCount) ? DormService.roomCount() : 0,
-    }));
-
-    const recentNotices = computed(() => {
-      if (!NoticeService || !NoticeService.getNotices) return [];
-      return NoticeService.getNotices().slice(0, 5);
+    // 统计数据（异步加载）
+    const stats = reactive({
+      studentCount: 0,
+      teacherCount: 0,
+      courseCount: 0,
+      scoreCount: 0,
+      noticeCount: 0,
+      roomCount: 0
     });
 
-    const recentLogs = computed(() => {
-      if (!UserService || !UserService.getOpLogs) return [];
-      return UserService.getOpLogs().slice(0, 6);
+    const recentNotices = ref([]);
+    const recentLogs = ref([]);
+
+    async function loadStats() {
+      if (UserService) {
+        try { stats.studentCount = await UserService.studentCount(); } catch {}
+        try { stats.teacherCount = await UserService.teacherCount(); } catch {}
+      }
+      if (CourseService && CourseService.courseCount) {
+        try { stats.courseCount = await CourseService.courseCount(); } catch {}
+      }
+      if (ScoreService && ScoreService.scoreCount) {
+        try { stats.scoreCount = await ScoreService.scoreCount(); } catch {}
+      }
+      if (NoticeService && NoticeService.noticeCount) {
+        try { stats.noticeCount = await NoticeService.noticeCount(); } catch {}
+      }
+      if (DormService && DormService.roomCount) {
+        try { stats.roomCount = await DormService.roomCount(); } catch {}
+      }
+    }
+
+    async function loadRecentData() {
+      if (NoticeService && NoticeService.getNotices) {
+        try { 
+          const notices = await NoticeService.getNotices();
+          recentNotices.value = (notices || []).slice(0, 5);
+        } catch {}
+      }
+      if (UserService && UserService.getOpLogs) {
+        try {
+          const logs = await UserService.getOpLogs();
+          recentLogs.value = (logs || []).slice(0, 6);
+        } catch {}
+      }
+    }
+
+    // 挂载时加载数据
+    onMounted(() => {
+      loadStats();
+      loadRecentData();
     });
 
     const switchMenu = (key) => {

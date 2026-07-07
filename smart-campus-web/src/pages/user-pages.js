@@ -1,13 +1,12 @@
 /* ============================================================
- * 用户服务 user-service - 页面组件（增强版）
+ * 用户服务 user-service - 页面组件（对接后端 API）
  * 页面：学生管理 / 学生批量录入 / 教师管理 / 教师批量录入 / 操作日志
- * 增强：学籍状态管理、操作日志、批量导入错误标注
  * ============================================================ */
 (function (global) {
 
   const E = ElementPlus;
 
-  // ========== 1. 学生管理（增强：学籍状态 + 操作日志入口） ==========
+  // ========== 1. 学生管理 ==========
   const PageUserStudent = {
     template: `
       <div class="page-wrapper">
@@ -100,7 +99,6 @@
           </div>
         </div>
 
-        <!-- 新增/编辑对话框 -->
         <el-dialog v-model="dialog.show" :title="dialog.mode==='add'?'新增学生':'编辑学生'" width="640px">
           <el-form label-width="100px">
             <el-row :gutter="16">
@@ -167,46 +165,57 @@
     },
     created() { this.load(); },
     methods: {
-      load() { this.list = UserService.getStudents(); },
+      async load() { this.list = await UserService.getStudents(); },
       statusType(s) { return { '在读': 'success', '休学': 'warning', '退学': 'danger', '毕业': 'info' }[s] || 'info'; },
       toggleStatusFilter(val) { this.filter.status = this.filter.status === val ? '' : val; },
       onSelect(rows) { this.selected = rows; },
-      changeStatus(row, newStatus) {
+      async changeStatus(row, newStatus) {
         if (row.status === newStatus) return;
-        E.ElMessageBox.confirm('确定将【' + row.name + '】的学籍状态变更为【' + newStatus + '】？', '学籍状态变更', { type: 'warning' })
-          .then(() => { UserService.changeStatus(row.id, newStatus); this.load(); }).catch(() => {});
+        try {
+          await E.ElMessageBox.confirm('确定将【' + row.name + '】的学籍状态变更为【' + newStatus + '】？', '学籍状态变更', { type: 'warning' });
+          await UserService.changeStatus(row.id, newStatus);
+          await this.load();
+        } catch {}
       },
-      batchChangeStatus(newStatus) {
+      async batchChangeStatus(newStatus) {
         if (!this.selected.length) return;
         const names = this.selected.slice(0, 3).map(s => s.name).join('、') + (this.selected.length > 3 ? '等' : '');
-        E.ElMessageBox.confirm('确定将【' + names + '】等 ' + this.selected.length + ' 名学生的学籍状态变更为【' + newStatus + '】？', '批量学籍状态变更', { type: 'warning' })
-          .then(() => {
-            UserService.batchChangeStatus(this.selected.map(s => s.id), newStatus);
-            this.load(); this.selected = [];
-          }).catch(() => {});
+        try {
+          await E.ElMessageBox.confirm('确定将【' + names + '】等 ' + this.selected.length + ' 名学生的学籍状态变更为【' + newStatus + '】？', '批量学籍状态变更', { type: 'warning' });
+          await UserService.batchChangeStatus(this.selected.map(s => s.id), newStatus);
+          await this.load();
+          this.selected = [];
+        } catch {}
       },
       openAdd() { this.dialog.mode = 'add'; this.form = { id: '', name: '', gender: '男', birth: '', college: '', major: '', grade: '大一', status: '在读', dorm: '', phone: '' }; this.dialog.show = true; },
       openEdit(row) { this.dialog.mode = 'edit'; this.form = Object.assign({}, row); this.dialog.show = true; },
-      submitForm() {
+      async submitForm() {
         if (!this.form.id || !this.form.name) { Common.showMsg('学号和姓名不能为空', 'warning'); return; }
-        if (this.dialog.mode === 'add') UserService.addStudent(this.form);
-        else UserService.updateStudent(this.form, this.form);
-        this.load(); this.dialog.show = false;
+        if (this.dialog.mode === 'add') await UserService.addStudent(this.form);
+        else await UserService.updateStudent(this.form, this.form);
+        await this.load(); this.dialog.show = false;
       },
-      confirmDelete(row) {
-        E.ElMessageBox.confirm('确定要删除学生【' + row.name + '】（学号：' + row.id + '）？', '删除确认', { type: 'warning' })
-          .then(() => { UserService.deleteStudent(row); this.load(); }).catch(() => {});
+      async confirmDelete(row) {
+        try {
+          await E.ElMessageBox.confirm('确定要删除学生【' + row.name + '】（学号：' + row.id + '）？', '删除确认', { type: 'warning' });
+          await UserService.deleteStudent(row);
+          await this.load();
+        } catch {}
       },
-      reset() {
-        E.ElMessageBox.confirm('将清空当前学生数据并恢复为示例数据，确定？', '重置确认', { type: 'warning' })
-          .then(() => { localStorage.removeItem('students'); this.load(); Common.showMsg('已重置学生数据'); }).catch(() => {});
+      async reset() {
+        try {
+          await E.ElMessageBox.confirm('将清空当前学生数据并恢复为示例数据，确定？', '重置确认', { type: 'warning' });
+          localStorage.removeItem('students');
+          await this.load();
+          Common.showMsg('已重置学生数据');
+        } catch {}
       },
       goBatch() { global.$app && global.$app.switchMenu('student-batch'); },
       goLogs() { global.$app && global.$app.switchMenu('op-log'); }
     }
   };
 
-  // ========== 2. 学生批量录入（增强：错误标注 + Excel支持） ==========
+  // ========== 2. 学生批量录入 ==========
   const PageUserStudentBatch = {
     template: `
       <div class="page-wrapper">
@@ -238,61 +247,49 @@
 
         <!-- 预览 + 错误标注结果 -->
         <div v-if="previewResult" class="panel" style="margin-top:16px">
-          <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
-            <span style="font-weight:700;font-size:15px">📊 校验结果</span>
-            <el-tag type="success" size="small">✅ 有效 {{ previewResult.valid }} 条</el-tag>
-            <el-tag type="danger" size="small" v-if="previewResult.errors.length">❌ 错误 {{ previewResult.errors.length }} 条</el-tag>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+            <div>
+              <el-tag type="success" size="medium">✅ 新增 {{ previewResult.added }} 条</el-tag>
+              <el-tag v-if="previewResult.skipped" type="warning" size="medium" style="margin-left:8px">⚠️ 跳过 {{ previewResult.skipped }} 条</el-tag>
+              <el-tag type="info" size="medium" style="margin-left:8px">共 {{ previewResult.total }} 条</el-tag>
+            </div>
+            <div style="display:flex;gap:8px">
+              <el-button type="primary" @click="doImport">✅ 确认导入</el-button>
+              <el-button @click="previewResult=null">取消</el-button>
+            </div>
           </div>
-
-          <!-- 错误行高亮显示 -->
-          <el-alert v-if="previewResult.errors.length" title="以下行存在错误，请修正后重新导入" type="error" :closable="false" style="margin-bottom:12px" />
-          <el-table v-if="previewResult.errors.length" :data="previewResult.errors" border stripe style="margin-bottom:14px;width:100%">
-            <el-table-column prop="row" label="行号" width="80" align="center">
-              <template #default="s"><el-tag type="danger" size="small" effect="dark">{{ s.row }}</el-tag></template>
-            </el-table-column>
-            <el-table-column prop="raw" label="原始数据" min-width="400">
-              <template #default="s"><code style="color:#f56c6c;font-size:12px">{{ s.raw }}</code></template>
-            </el-table-column>
-            <el-table-column prop="msg" label="错误原因" min-width="200">
-              <template #default="s"><span style="color:#f56c6c;font-size:13px">{{ s.msg }}</span></template>
-            </el-table-column>
+          <div v-if="previewResult.errors && previewResult.errors.length" style="background:#fef0f0;border-radius:8px;padding:12px;margin-bottom:12px;font-size:13px">
+            <div style="color:#f56c6c;font-weight:600;margin-bottom:6px">⚠️ 校验告警（以下行被跳过）：</div>
+            <div v-for="(err, i) in previewResult.errors" :key="i" style="color:#606266">行 {{ err.row }}: {{ err.msg }}</div>
+          </div>
+          <el-table :data="previewRows" border stripe style="width:100%" max-height="360">
+            <el-table-column type="index" label="#" width="50" />
+            <el-table-column prop="id" label="学号" width="110" />
+            <el-table-column prop="name" label="姓名" width="100" />
+            <el-table-column prop="gender" label="性别" width="70" />
+            <el-table-column prop="college" label="学院" width="120" />
+            <el-table-column prop="major" label="专业" width="130" />
+            <el-table-column prop="phone" label="电话" width="130" />
+            <el-table-column prop="dorm" label="宿舍" width="120" />
           </el-table>
-
-          <!-- 有效数据预览（截断显示前5条） -->
-          <div v-if="previewResult.validRows.length">
-            <el-alert title="有效数据预览（前5条）" type="success" :closable="false" style="margin-bottom:8px" />
-            <el-table :data="previewResult.validRows.slice(0,5)" border size="small" style="margin-bottom:14px">
-              <el-table-column prop="id" label="学号" width="100" />
-              <el-table-column prop="name" label="姓名" width="90" />
-              <el-table-column prop="gender" label="性别" width="60" align="center" />
-              <el-table-column prop="college" label="学院" width="120" />
-              <el-table-column prop="major" label="专业" width="130" />
-              <el-table-column prop="phone" label="电话" width="130" />
-              <el-table-column prop="dorm" label="宿舍" width="110" />
-            </el-table>
-          </div>
-
-          <div style="display:flex;gap:10px">
-            <el-button type="primary" @click="confirmImport" :disabled="!previewResult.validRows.length">✅ 确认导入（{{ previewResult.valid }} 条有效记录）</el-button>
-          </div>
         </div>
 
-        <!-- 导入结果 -->
-        <el-dialog v-model="resultDialog.show" title="✅ 批量录入结果" width="520px">
-          <div style="line-height:2.2;font-size:14px;color:#606266">
-            <div style="font-size:16px;color:#303133;font-weight:700;margin-bottom:14px">📊 导入完成</div>
-            <div>✅ 新增成功：<strong style="color:#67c23a;font-size:20px">{{ resultDialog.data.added }}</strong> 条</div>
-            <div>⚠️ 跳过（重复）：<strong style="color:#e6a23c;font-size:20px">{{ resultDialog.data.skipped }}</strong> 条</div>
-            <div>❌ 错误（无效）：<strong style="color:#f56c6c;font-size:20px">{{ resultDialog.data.errors.length }}</strong> 条</div>
+        <el-dialog v-model="result.show" title="✅ 批量导入结果" width="520px">
+          <div style="text-align:center;padding:12px 0">
+            <div style="font-size:48px;margin-bottom:12px">✅</div>
+            <div style="font-size:18px;font-weight:700;color:#303133;margin-bottom:12px">批量导入完成</div>
+            <div style="display:flex;justify-content:center;gap:24px">
+              <div><div style="font-size:28px;font-weight:700;color:#67c23a">{{ result.added }}</div><div style="font-size:13px;color:#606266">新增</div></div>
+              <div><div style="font-size:28px;font-weight:700;color:#e6a23c">{{ result.skipped }}</div><div style="font-size:13px;color:#606266">跳过</div></div>
+              <div><div style="font-size:28px;font-weight:700;color:#303133">{{ result.total }}</div><div style="font-size:13px;color:#606266">总计</div></div>
+            </div>
           </div>
-          <template #footer>
-            <el-button type="primary" @click="resultDialog.show=false;text='';previewResult=null">完成</el-button>
-          </template>
+          <template #footer><el-button type="primary" @click="result.show=false;text='';previewResult=null">完成</el-button></template>
         </el-dialog>
       </div>
     `,
     data() {
-      return { text: '', previewResult: null, resultDialog: { show: false, data: { added: 0, skipped: 0, errors: [] } } };
+      return { text: '', previewResult: null, previewRows: [], result: { show: false, added: 0, skipped: 0, total: 0 } };
     },
     methods: {
       downloadTemplate() {
@@ -306,55 +303,44 @@
         Common.showMsg('模板已下载');
       },
       handleUpload(file) {
-        const raw = file.raw || file;
         const reader = new FileReader();
-        reader.onload = (e) => {
-          this.text = e.target.result;
-          this.doPreview();
-          Common.showMsg('文件已加载，正在校验…');
-        };
-        if (raw.name.endsWith('.xlsx')) {
-          reader.readAsArrayBuffer(raw).then(() => {
+        reader.onload = (e) => { this.text = e.target.result; Common.showMsg('文件已加载'); };
+        if (file.raw && file.raw.name && file.raw.name.endsWith('.xlsx')) {
+          // XLSX 通过 SheetJS 解析
+          reader.onload = (e) => {
             try {
-              const data = new Uint8Array(reader.result);
-              const workbook = XLSX.read(data, { type: 'array' });
-              const sheet = workbook.Sheets[workbook.SheetNames[0]];
-              const csv = XLSX.utils.sheet_to_csv(sheet);
-              this.text = csv;
-              this.doPreview();
+              const wb = XLSX.read(e.target.result, { type: 'array' });
+              const ws = wb.Sheets[wb.SheetNames[0]];
+              const json = XLSX.utils.sheet_to_json(ws, { header: 1 });
+              this.text = json.map(row => row.join(',')).join('\n');
               Common.showMsg('Excel 文件已解析');
-            } catch (ex) { Common.showMsg('Excel 解析失败，请导出为 CSV 后重试', 'error'); }
-          });
+            } catch (err) {
+              Common.showMsg('解析 Excel 失败：' + err.message, 'error');
+            }
+          };
+          reader.readAsArrayBuffer(file.raw);
         } else {
-          reader.readAsText(raw, 'UTF-8');
+          reader.readAsText(file.raw || file, 'UTF-8');
         }
       },
       doPreview() {
-        if (!this.text.trim()) { Common.showMsg('请输入数据', 'warning'); return; }
         const lines = this.text.split(/\r?\n/).map(l => l.trim()).filter(l => l);
         if (!lines.length) { Common.showMsg('未找到有效数据', 'warning'); return; }
-        const validRows = [], errors = [];
-        const existingIds = UserService.getStudents().map(s => s.id);
+        const rows = []; const errors = []; let skipped = 0;
         lines.forEach((line, i) => {
-          if (i === 0 && (line.includes('学号') || line.toLowerCase().includes('id') || line.toLowerCase().includes('name'))) return;
+          if (i === 0 && (line.toLowerCase().includes('学号') || line.toLowerCase().includes('姓名'))) { skipped++; return; }
           const parts = line.split(/[,，\t]/).map(p => p.trim());
-          const rowNum = i + 1;
-          if (parts.length < 2) { errors.push({ row: rowNum, raw: line, msg: '字段不足（至少需要学号和姓名）' }); return; }
-          const [id, name, gender, birth, college, major, phone, dorm] = parts;
-          if (!id) { errors.push({ row: rowNum, raw: line, msg: '学号为空' }); return; }
-          if (!name) { errors.push({ row: rowNum, raw: line, msg: '姓名为空' }); return; }
-          if (existingIds.includes(id)) { errors.push({ row: rowNum, raw: line, msg: '学号 ' + id + ' 已存在（重复跳过）' }); return; }
-          validRows.push({ id, name, gender: gender || '男', birth: birth || '', college: college || '计算机学院', major: major || '软件工程', phone: phone || '', dorm: dorm || '', grade: '大一', status: '在读', createAt: Common.today() });
+          if (parts.length < 2) { errors.push({ row: i + 1, msg: '字段不足（至少需要学号和姓名）' }); skipped++; return; }
+          rows.push({ id: parts[0], name: parts[1], gender: parts[2] || '男', birth: parts[3] || '', college: parts[4] || '', major: parts[5] || '', phone: parts[6] || '', dorm: parts[7] || '', status: '在读' });
         });
-        this.previewResult = { valid: validRows.length, errors, validRows };
+        this.previewRows = rows;
+        this.previewResult = { added: rows.length, skipped, total: lines.length, errors };
       },
-      confirmImport() {
-        if (!this.previewResult || !this.previewResult.validRows.length) return;
-        const result = UserService.batchAddStudents(this.previewResult.validRows);
-        this.resultDialog = { show: true, data: result };
-        this.load();
+      async doImport() {
+        if (!this.previewRows.length) { Common.showMsg('没有可导入的数据', 'warning'); return; }
+        const res = await UserService.batchAddStudents(this.previewRows);
+        this.result = { show: true, added: res.added, skipped: res.skipped + (this.previewResult ? this.previewResult.skipped : 0), total: res.total };
       },
-      load() { this.$parent.$forceUpdate && this.$parent.$forceUpdate(); },
       goList() { global.$app && global.$app.switchMenu('student-list'); }
     }
   };
@@ -366,7 +352,7 @@
         <div class="page-header">
           <div>
             <div class="page-title">👨‍🏫 教师信息管理</div>
-            <div class="page-desc">管理教职工基础信息、职称与学院归属</div>
+            <div class="page-desc">管理全校教职工基本信息与职称信息</div>
           </div>
           <div style="display:flex;gap:10px">
             <el-button type="primary" @click="openAdd">+ 新增教师</el-button>
@@ -375,10 +361,9 @@
             <el-button plain @click="reset">🔄 重置数据</el-button>
           </div>
         </div>
-
         <div class="panel">
           <div style="display:flex;gap:12px;margin-bottom:16px">
-            <el-input v-model="filter.keyword" placeholder="工号/姓名/电话" clearable style="width:260px" />
+            <el-input v-model="filter.keyword" placeholder="工号/姓名/电话" clearable style="width:240px" />
             <el-select v-model="filter.college" placeholder="全部学院" clearable style="width:160px">
               <el-option v-for="c in collegeOptions" :key="c" :label="c" :value="c" />
             </el-select>
@@ -386,17 +371,17 @@
               <el-option v-for="t in titleOptions" :key="t" :label="t" :value="t" />
             </el-select>
           </div>
-          <el-table :data="pagedList" border stripe style="width:100%">
-            <el-table-column prop="id" label="工号" width="110" />
-            <el-table-column prop="name" label="姓名" width="100" />
-            <el-table-column prop="gender" label="性别" width="80" align="center" />
+          <el-table :data="filteredList" border stripe style="width:100%">
+            <el-table-column prop="id" label="工号" width="100" />
+            <el-table-column prop="name" label="姓名" width="90" />
+            <el-table-column prop="gender" label="性别" width="70" align="center" />
             <el-table-column prop="college" label="学院" width="140" />
-            <el-table-column prop="title" label="职称" width="100" />
-            <el-table-column prop="major" label="专业方向" width="160" />
-            <el-table-column prop="phone" label="电话" width="140" />
+            <el-table-column prop="title" label="职称" width="100" align="center" />
+            <el-table-column prop="major" label="专业方向" width="150" />
+            <el-table-column prop="phone" label="联系电话" width="140" />
             <el-table-column prop="email" label="邮箱" width="180" />
             <el-table-column prop="joinYear" label="入职年份" width="100" align="center" />
-            <el-table-column label="操作" width="160" fixed="right">
+            <el-table-column label="操作" width="150" fixed="right">
               <template #default="s">
                 <el-button size="small" @click="openEdit(s.row)">编辑</el-button>
                 <el-button size="small" type="danger" plain @click="confirmDelete(s.row)">删除</el-button>
@@ -447,22 +432,29 @@
     },
     created() { this.load(); },
     methods: {
-      load() { this.list = UserService.getTeachers(); },
+      async load() { this.list = await UserService.getTeachers(); },
       openAdd() { this.dialog.mode = 'add'; this.form = { id: '', name: '', gender: '男', college: '', title: '讲师', major: '', phone: '', email: '', joinYear: 2025 }; this.dialog.show = true; },
       openEdit(row) { this.dialog.mode = 'edit'; this.form = Object.assign({}, row); this.dialog.show = true; },
-      submitForm() {
+      async submitForm() {
         if (!this.form.id || !this.form.name) { Common.showMsg('工号和姓名不能为空', 'warning'); return; }
-        if (this.dialog.mode === 'add') UserService.addTeacher(this.form);
-        else UserService.updateTeacher(this.form, this.form);
-        this.load(); this.dialog.show = false;
+        if (this.dialog.mode === 'add') await UserService.addTeacher(this.form);
+        else await UserService.updateTeacher(this.form, this.form);
+        await this.load(); this.dialog.show = false;
       },
-      confirmDelete(row) {
-        E.ElMessageBox.confirm('确定要删除教师【' + row.name + '】？', '删除确认', { type: 'warning' })
-          .then(() => { UserService.deleteTeacher(row); this.load(); }).catch(() => {});
+      async confirmDelete(row) {
+        try {
+          await E.ElMessageBox.confirm('确定要删除教师【' + row.name + '】？', '删除确认', { type: 'warning' });
+          await UserService.deleteTeacher(row);
+          await this.load();
+        } catch {}
       },
-      reset() {
-        E.ElMessageBox.confirm('将清空当前教师数据并恢复为示例数据，确定？', '重置确认', { type: 'warning' })
-          .then(() => { localStorage.removeItem('teachers'); this.load(); Common.showMsg('已重置教师数据'); }).catch(() => {});
+      async reset() {
+        try {
+          await E.ElMessageBox.confirm('将清空当前教师数据并恢复为示例数据，确定？', '重置确认', { type: 'warning' });
+          localStorage.removeItem('teachers');
+          await this.load();
+          Common.showMsg('已重置教师数据');
+        } catch {}
       },
       goBatch() { global.$app && global.$app.switchMenu('teacher-batch'); },
       goLogs() { global.$app && global.$app.switchMenu('op-log'); }
@@ -526,7 +518,7 @@
         reader.onload = (e) => { this.text = e.target.result; Common.showMsg('文件已加载'); };
         reader.readAsText(file.raw || file, 'UTF-8');
       },
-      confirmBatch() {
+      async confirmBatch() {
         const lines = this.text.split(/\r?\n/).map(l => l.trim()).filter(l => l);
         if (!lines.length) { Common.showMsg('未找到有效数据', 'warning'); return; }
         const records = []; let skipped = 0;
@@ -537,7 +529,7 @@
           records.push({ id: parts[0] || '', name: parts[1] || '', gender: parts[2] || '男', college: parts[3] || '计算机学院', title: parts[4] || '讲师', major: parts[5] || '', phone: parts[6] || '', email: parts[7] || '', joinYear: 2025 });
         });
         if (!records.length) { Common.showMsg('没有可录入的数据', 'warning'); return; }
-        const res = UserService.batchAddTeachers(records);
+        const res = await UserService.batchAddTeachers(records);
         this.result = { show: true, added: res.added, skipped: res.skipped + skipped };
       },
       goList() { global.$app && global.$app.switchMenu('teacher-list'); }
@@ -623,12 +615,16 @@
     },
     created() { this.load(); },
     methods: {
-      load() { this.logs = UserService.getOpLogs(); },
+      async load() { this.logs = await UserService.getOpLogs(); },
       countByType(type) { return this.logs.filter(l => l.type === type).length; },
       logTypeTag(type) { return { '新增': 'success', '编辑': 'warning', '删除': 'danger', '状态变更': 'info', '批量新增': 'success', '批量状态变更': 'info' }[type] || 'info'; },
-      clearLogs() {
-        E.ElMessageBox.confirm('确定清空所有操作日志？此操作不可恢复', '清空确认', { type: 'warning' })
-          .then(() => { localStorage.removeItem('oplogs'); this.load(); Common.showMsg('日志已清空'); }).catch(() => {});
+      async clearLogs() {
+        try {
+          await E.ElMessageBox.confirm('确定清空所有操作日志？此操作不可恢复', '清空确认', { type: 'warning' });
+          await UserService.clearOpLogs();
+          await this.load();
+          Common.showMsg('日志已清空');
+        } catch {}
       }
     }
   };
