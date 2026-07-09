@@ -72,6 +72,14 @@ const AppConfig = {
         { key: 'library-book', title: '书籍管理', icon: '\u{1F4DA}', roles: ['admin', 'teacher', 'student'] },
         { key: 'library-borrow', title: '借阅管理', icon: '\u{1F4D6}', roles: ['admin', 'teacher', 'student'] }
       ]
+    },
+    {
+      title: 'AI 智能分析',
+      icon: '\u{1F916}',
+      roles: ['admin', 'teacher', 'student'],
+      items: [
+        { key: 'ai-dashboard', title: 'AI 数据分析', icon: '\u{1F4CA}', roles: ['admin', 'teacher', 'student'] }
+      ]
     }
   ]
 };
@@ -379,6 +387,7 @@ const App = {
           <page-dorm v-else-if="currentPage==='dorm'"></page-dorm>
           <page-library-book v-else-if="currentPage==='library-book'"></page-library-book>
           <page-library-borrow v-else-if="currentPage==='library-borrow'"></page-library-borrow>
+          <page-ai-dashboard v-else-if="currentPage==='ai-dashboard'"></page-ai-dashboard>
         </section>
       </main>
     </div>
@@ -411,5 +420,6 @@ window.initApp = function () {
   app.component('page-dorm', DormPages.PageDorm);
   app.component('page-library-book', LibraryPages.PageLibraryBook);
   app.component('page-library-borrow', LibraryPages.PageLibraryBorrow);
+  app.component('page-ai-dashboard', AIPages.PageAIDashboard);
   app.mount('#app');
 };

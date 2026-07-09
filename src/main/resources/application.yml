@@ -33,6 +33,14 @@ jwt:
   secret: CampusAi2024SmartSystemSecretKeyForJWTTokenGenerationMustBe256BitsLong
   expiration: 86400000  # 24 小时（毫秒）
 
+# DeepSeek AI 配置
+deepseek:
+  api-url: https://api.deepseek.com/v1/chat/completions
+  api-key: ${DEEPSEEK_API_KEY:sk-your-api-key-here}
+  model: deepseek-chat
+  temperature: 0.7
+  max-tokens: 2048
+
 # 日志配置
 logging:
   level:
