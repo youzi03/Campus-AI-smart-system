@@ -290,10 +290,9 @@
       async returnBook(row) {
         try { await ElementPlus.ElMessageBox.confirm('确定：' + row.studentName + ' 归还《' + row.bookTitle + '》？', '确认归还', { type: 'info' }); await LibraryService.returnBook(row.id); await this.load(); } catch {}
       },
-      renewBook(row) { LibraryService.renewBook(row.id); this.load(); },
-      confirmDelete(row) {
-        ElementPlus.ElMessageBox.confirm('确定删除该借阅记录？注意：此操作不会影响书籍库存数量', '删除确认', { type: 'warning' })
-          .then(() => { LibraryService.deleteBorrow(row.id); this.load(); }).catch(() => {});
+      async renewBook(row) { try { await LibraryService.renewBook(row.id); await this.load(); } catch {} },
+      async confirmDelete(row) {
+        try { await ElementPlus.ElMessageBox.confirm('确定删除该借阅记录？', '删除确认', { type: 'warning' }); await LibraryService.deleteBorrow(row.id); await this.load(); } catch {}
       }
     }
   };

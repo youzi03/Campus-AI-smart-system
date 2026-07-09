@@ -43,6 +43,14 @@
       try{return await apiClient.put('/borrow-records/'+id+'/return');}
       catch{var list=JSON.parse(localStorage.getItem('borrows')||'null')||borrowSample;var idx=list.findIndex(function(x){return x.id===id;});if(idx>=0){list[idx].status='已归还';list[idx].returnDate=Common.today();localStorage.setItem('borrows',JSON.stringify(list));}Common.showMsg('归还成功');}
     },
+    async renewBook(id) {
+      try{return await apiClient.put('/borrow-records/'+id+'/return');}
+      catch{Common.showMsg('续借成功（模拟）');}
+    },
+    async deleteBorrow(id) {
+      try{return await apiClient.del('/borrow-records/'+id);}
+      catch{var list=(JSON.parse(localStorage.getItem('borrows')||'null')||borrowSample).filter(function(x){return x.id!==id;});localStorage.setItem('borrows',JSON.stringify(list));Common.showMsg('删除成功');}
+    },
     get categoryOptions() { return ['计算机','数学','物理','外语','经济','文学','艺术','历史','哲学']; }
   };
   global.LibraryService = LibraryService;
