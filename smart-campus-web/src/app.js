@@ -187,29 +187,29 @@ const App = {
     <div class="app-layout">
       <aside class="sidebar">
         <div class="sidebar-header">
-          <div style="font-size:24px">&#127891;</div>
-          <div style="font-size:17px;font-weight:700;color:#fff;letter-spacing:1px">&#26684;&#23398;&#22253;&#20449;&#24687;&#31649;&#29702;</div>
-          <div style="font-size:12px;color:#a0b8d8;margin-top:2px">Smart Campus v1.0</div>
+          <div style="font-size:26px">🎓</div>
+          <div style="font-size:16px;font-weight:700;color:#1e293b;letter-spacing:-0.3px">智慧校园管理系统</div>
+          <div style="font-size:12px;color:#94a3b8;margin-top:2px">Smart Campus v2.0</div>
         </div>
 
         <div style="padding:8px 12px 4px">
           <div
             @click="switchMenu('home')"
-            :style="'display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:500;transition:all 0.2s;' + (currentPage==='home'?'background:linear-gradient(90deg,#3a7bd5,#4a8de0);color:#fff;box-shadow:0 2px 8px rgba(58,123,213,0.4);':'background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.75);')"
+            :style="'display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:500;transition:all 0.2s;' + (currentPage==='home'?'background:linear-gradient(135deg,#4f6ef7,#6c5ce7);color:#fff;box-shadow:0 2px 8px rgba(79,110,247,0.4);':'background:var(--color-primary-light);color:var(--color-primary);')"
           >
             <span style="font-size:16px">&#127968;</span>
             <span>&#39318;&#39029;</span>
           </div>
         </div>
-        <el-divider style="margin:6px 12px;border-color:rgba(255,255,255,0.1)" />
+        <el-divider style="margin:6px 12px;border-color:var(--color-border)" />
 
         <!-- 按角色过滤的菜单 -->
         <el-menu
           :default-active="currentPage"
           @select="switchMenu"
-          background-color="#1a3a5c"
-          text-color="#c9d8e8"
-          active-text-color="#ffffff"
+          background-color="#ffffff"
+          text-color="#475569"
+          active-text-color="#4f6ef7"
           style="border-right:none;background:transparent;flex:1"
           class="sidebar-menu"
         >
@@ -225,18 +225,18 @@ const App = {
       <main class="main-area">
         <header class="top-bar">
           <div style="display:flex;align-items:center;gap:12px">
-            <div style="font-size:16px;color:#303133;font-weight:600">{{ currentTitle }}</div>
+            <div style="font-size:16px;color:#1e293b;font-weight:600">{{ currentTitle }}</div>
             <el-tag size="small" type="info">{{ now }}</el-tag>
           </div>
           <div style="display:flex;align-items:center;gap:14px">
             <el-tooltip content="&#28857;&#20987;&#21047;&#26032;&#24403;&#21069;&#39029;&#38754;" placement="bottom">
-              <el-icon :size="20" @click="switchMenu(currentPage)" style="cursor:pointer;color:#606266">&#128260;</el-icon>
+              <el-icon :size="20" @click="switchMenu(currentPage)" style="cursor:pointer;color:#94a3b8">&#128260;</el-icon>
             </el-tooltip>
             <!-- 用户信息 + 登出 -->
             <el-dropdown trigger="click" @command="handleLogout">
-              <div style="display:flex;align-items:center;gap:8px;padding:4px 12px;background:#f0f7ff;border-radius:20px;cursor:pointer">
+              <div style="display:flex;align-items:center;gap:8px;padding:4px 12px;background:#eef1ff;border-radius:20px;cursor:pointer">
                 <div style="font-size:20px">&#128100;</div>
-                <div style="font-size:14px;color:#303133;font-weight:500">{{ userName }}</div>
+                <div style="font-size:14px;color:#1e293b;font-weight:500">{{ userName }}</div>
                 <el-tag size="small" :type="userRole==='admin'?'danger':userRole==='teacher'?'warning':'success'" effect="plain" style="margin-left:2px">{{ {admin:'管理员',teacher:'教师',student:'学生'}[userRole] || userRole }}</el-tag>
               </div>
               <template #dropdown>
@@ -263,12 +263,12 @@ const App = {
             <div class="home-section-title">&#9889; &#24555;&#25463;&#20837;&#21475;</div>
             <el-row :gutter="14" style="margin-bottom:20px">
               <el-col :span="4" v-for="(item, idx) in [
-                {key:'student-list', title:'&#23398;&#29983;&#20449;&#24687;', icon:'&#127894;', color:'#e8f1fb', textColor:'#2e5fa8', roles:['admin']},
-                {key:'score-input', title:'&#25104;&#32489;&#24405;&#20837;', icon:'&#9998;', color:'#e6f9f7', textColor:'#2d8f6f', roles:['admin','teacher']},
-                {key:'notice-publish', title:'&#21457;&#24067;&#20844;&#21578;', icon:'&#128227;', color:'#fef0f0', textColor:'#c44a6a', roles:['admin','teacher']},
-                {key:'schedule', title:'&#26597;&#30475;&#35838;&#34920;', icon:'&#128197;', color:'#f5f0ff', textColor:'#6b4a9a', roles:['admin','teacher','student']},
-                {key:'dorm', title:'&#23487;&#20250;&#31649;&#29702;', icon:'&#128719;', color:'#e8f5f9', textColor:'#2a7a9a', roles:['admin']},
-                {key:'library-book', title:'&#22270;&#20070;&#31649;&#29702;', icon:'&#128218;', color:'#fef4e6', textColor:'#b07030', roles:['admin','teacher','student']}
+                {key:'student-list', title:'学生信息', icon:'🎓', color:'#eef1ff', textColor:'#4f6ef7', roles:['admin']},
+                {key:'score-input', title:'成绩录入', icon:'✏', color:'#ecfdf5', textColor:'#16a34a', roles:['admin','teacher']},
+                {key:'notice-publish', title:'发布公告', icon:'📣', color:'#fef2f2', textColor:'#ef4444', roles:['admin','teacher']},
+                {key:'schedule', title:'查看课表', icon:'📅', color:'#f5f3ff', textColor:'#7c3aed', roles:['admin','teacher','student']},
+                {key:'dorm', title:'宿舍管理', icon:'🏠', color:'#ecfeff', textColor:'#0891b2', roles:['admin']},
+                {key:'library-book', title:'图书管理', icon:'📚', color:'#fff7ed', textColor:'#c2410c', roles:['admin','teacher','student']}
               ].filter(x => !x.roles || x.roles.includes(userRole))" :key="idx">
                 <div
                   @click="switchMenu(item.key)"
@@ -284,45 +284,45 @@ const App = {
             <div class="home-section-title">&#128202; &#25968;&#25454;&#32479;&#35745;</div>
             <el-row :gutter="14" style="margin-bottom:20px">
               <el-col :span="4">
-                <div class="stat-card-home" style="background:linear-gradient(135deg,#e8f1fb,#dbe9fb)">
-                  <div style="font-size:26px;margin-bottom:8px">&#127894;</div>
-                  <div style="font-size:26px;font-weight:800;color:#2e5fa8">{{ stats.studentCount }}</div>
-                  <div style="font-size:13px;color:#606266;margin-top:4px">&#23398;&#29983;&#24635;&#25968;</div>
+                <div class="stat-card-home" style="background:linear-gradient(135deg,#eef1ff,#e2e5ff)">
+                  <div style="font-size:26px;margin-bottom:8px">🎓</div>
+                  <div style="font-size:26px;font-weight:800;color:#4f6ef7">{{ stats.studentCount }}</div>
+                  <div style="font-size:13px;color:#64748b;margin-top:4px">学生总数</div>
                 </div>
               </el-col>
               <el-col :span="4">
-                <div class="stat-card-home" style="background:linear-gradient(135deg,#e6f9f7,#d9f2e6)">
-                  <div style="font-size:26px;margin-bottom:8px">&#128104;&#8205;&#127979;</div>
-                  <div style="font-size:26px;font-weight:800;color:#2d8f6f">{{ stats.teacherCount }}</div>
-                  <div style="font-size:13px;color:#606266;margin-top:4px">&#25945;&#32844;&#24037;&#25968;</div>
+                <div class="stat-card-home" style="background:linear-gradient(135deg,#ecfdf5,#d1fae5)">
+                  <div style="font-size:26px;margin-bottom:8px">👨‍🏫</div>
+                  <div style="font-size:26px;font-weight:800;color:#16a34a">{{ stats.teacherCount }}</div>
+                  <div style="font-size:13px;color:#64748b;margin-top:4px">教职工数</div>
                 </div>
               </el-col>
               <el-col :span="4">
-                <div class="stat-card-home" style="background:linear-gradient(135deg,#fef4e6,#fde8cd)">
-                  <div style="font-size:26px;margin-bottom:8px">&#128218;</div>
-                  <div style="font-size:26px;font-weight:800;color:#b07030">{{ stats.courseCount }}</div>
-                  <div style="font-size:13px;color:#606266;margin-top:4px">&#24320;&#35774;&#35838;&#31243;</div>
+                <div class="stat-card-home" style="background:linear-gradient(135deg,#fff7ed,#ffedd5)">
+                  <div style="font-size:26px;margin-bottom:8px">📖</div>
+                  <div style="font-size:26px;font-weight:800;color:#c2410c">{{ stats.courseCount }}</div>
+                  <div style="font-size:13px;color:#64748b;margin-top:4px">开设课程</div>
                 </div>
               </el-col>
               <el-col :span="4">
-                <div class="stat-card-home" style="background:linear-gradient(135deg,#f5f0ff,#e8dbf5)">
-                  <div style="font-size:26px;margin-bottom:8px">&#128203;</div>
-                  <div style="font-size:26px;font-weight:800;color:#6b4a9a">{{ stats.scoreCount }}</div>
-                  <div style="font-size:13px;color:#606266;margin-top:4px">&#25104;&#32489;&#35760;&#24405;</div>
+                <div class="stat-card-home" style="background:linear-gradient(135deg,#f5f3ff,#ede9fe)">
+                  <div style="font-size:26px;margin-bottom:8px">📋</div>
+                  <div style="font-size:26px;font-weight:800;color:#7c3aed">{{ stats.scoreCount }}</div>
+                  <div style="font-size:13px;color:#64748b;margin-top:4px">成绩记录</div>
                 </div>
               </el-col>
               <el-col :span="4">
-                <div class="stat-card-home" style="background:linear-gradient(135deg,#fef0f0,#fde2e2)">
-                  <div style="font-size:26px;margin-bottom:8px">&#128226;</div>
-                  <div style="font-size:26px;font-weight:800;color:#c44a6a">{{ stats.noticeCount }}</div>
-                  <div style="font-size:13px;color:#606266;margin-top:4px">&#21457;&#24067;&#20844;&#21578;</div>
+                <div class="stat-card-home" style="background:linear-gradient(135deg,#fef2f2,#fecaca)">
+                  <div style="font-size:26px;margin-bottom:8px">🔔</div>
+                  <div style="font-size:26px;font-weight:800;color:#ef4444">{{ stats.noticeCount }}</div>
+                  <div style="font-size:13px;color:#64748b;margin-top:4px">发布公告</div>
                 </div>
               </el-col>
               <el-col :span="4">
-                <div class="stat-card-home" style="background:linear-gradient(135deg,#e8f5f9,#d3eaf5)">
-                  <div style="font-size:26px;margin-bottom:8px">&#128719;</div>
-                  <div style="font-size:26px;font-weight:800;color:#2a7a9a">{{ stats.roomCount }}</div>
-                  <div style="font-size:13px;color:#606266;margin-top:4px">&#23487;&#20250;&#25968;&#37327;</div>
+                <div class="stat-card-home" style="background:linear-gradient(135deg,#ecfeff,#cffafe)">
+                  <div style="font-size:26px;margin-bottom:8px">🏠</div>
+                  <div style="font-size:26px;font-weight:800;color:#0891b2">{{ stats.roomCount }}</div>
+                  <div style="font-size:13px;color:#64748b;margin-top:4px">宿舍数量</div>
                 </div>
               </el-col>
             </el-row>
@@ -337,7 +337,7 @@ const App = {
                       style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #f0f0f0;cursor:pointer"
                       :style="i === recentNotices.length - 1 ? 'border-bottom:none' : ''"
                       @click="switchMenu('notice-list')">
-                      <div style="width:8px;height:8px;border-radius:50%;background:#3a7bd5;flex-shrink:0"></div>
+                      <div style="width:8px;height:8px;border-radius:50%;background:#4f6ef7;flex-shrink:0"></div>
                       <div style="flex:1;min-width:0">
                         <div style="font-size:13px;color:#303133;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ n.title }}</div>
                         <div style="font-size:12px;color:#909399;margin-top:2px">{{ n.time || n.createAt }}</div>
@@ -354,7 +354,7 @@ const App = {
                     <div v-for="(log, i) in recentLogs" :key="i"
                       style="display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid #f0f0f0"
                       :style="i === recentLogs.length - 1 ? 'border-bottom:none' : ''">
-                      <div style="width:6px;height:6px;border-radius:50%;background:#3a7bd5;flex-shrink:0;margin-top:6px"></div>
+                      <div style="width:6px;height:6px;border-radius:50%;background:#4f6ef7;flex-shrink:0;margin-top:6px"></div>
                       <div style="flex:1;min-width:0">
                         <div style="font-size:13px;color:#303133">{{ log.detail }}</div>
                         <div style="font-size:12px;color:#909399;margin-top:2px">{{ log.time }}</div>

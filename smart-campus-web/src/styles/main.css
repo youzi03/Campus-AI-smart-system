@@ -1,5 +1,5 @@
 /* ========================================
- * 主布局与通用样式
+ * 主布局与通用样式 v2.0 — 现代简约
  * ======================================== */
 
 * { box-sizing: border-box; }
@@ -9,7 +9,7 @@ html, body, #app {
   margin: 0;
   padding: 0;
   font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei",
-               "Helvetica Neue", Helvetica, Arial, sans-serif;
+               "Inter", "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: var(--color-text-main);
   background: var(--color-bg);
   font-size: var(--font-size-base);
@@ -26,52 +26,57 @@ html, body, #app {
 
 /* ========== 侧边栏 ========== */
 .sidebar {
-  width: 230px;
-  min-width: 230px;
-  background: linear-gradient(180deg, #1a3a5c 0%, #1e4a7a 100%);
+  width: 240px;
+  min-width: 240px;
+  background: var(--color-bg-sidebar);
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  box-shadow: 2px 0 12px rgba(26, 58, 92, 0.25);
+  box-shadow: var(--shadow-sidebar);
+  border-right: 1px solid var(--color-border-light);
+  z-index: 10;
 }
 
 .sidebar-header {
-  padding: 20px 16px 16px;
+  padding: 22px 18px 18px;
   text-align: center;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid var(--color-border-light);
 }
 
+/* ========== 侧边栏菜单 ========== */
 .sidebar-menu {
   border-right: none !important;
   flex: 1;
   background: transparent !important;
   overflow-y: auto;
   overflow-x: hidden;
+  padding: 6px 0;
 }
 
 .sidebar-menu .el-menu-item,
 .sidebar-menu .el-sub-menu__title {
-  height: 44px !important;
-  line-height: 44px !important;
-  margin: 3px 10px;
+  height: 42px !important;
+  line-height: 42px !important;
+  margin: 2px 10px;
   padding-left: 14px !important;
   padding-right: 14px !important;
   border-radius: 8px;
-  font-size: 14px;
-  color: rgba(255, 255, 255, 0.75) !important;
+  font-size: 13.5px;
+  color: var(--color-text-regular) !important;
   transition: all 0.2s ease;
 }
 
 .sidebar-menu .el-menu-item:hover,
 .sidebar-menu .el-sub-menu__title:hover {
-  background: rgba(255, 255, 255, 0.12) !important;
-  color: #ffffff !important;
+  background: var(--color-primary-light) !important;
+  color: var(--color-primary) !important;
 }
 
 .sidebar-menu .el-menu-item.is-active {
-  background: linear-gradient(90deg, #3a7bd5, #4a8de0) !important;
+  background: var(--color-primary-gradient) !important;
   color: #ffffff !important;
-  box-shadow: 0 2px 8px rgba(58, 123, 213, 0.4);
+  box-shadow: 0 4px 12px rgba(79, 110, 247, 0.35);
+  font-weight: 500;
 }
 
 .sidebar-menu .el-sub-menu .el-menu-item {
@@ -89,32 +94,37 @@ html, body, #app {
 }
 
 .top-bar {
-  height: 58px;
-  min-height: 58px;
-  background: #ffffff;
+  height: 60px;
+  min-height: 60px;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--color-border-light);
-  padding: 0 24px;
+  padding: 0 28px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+  position: sticky;
+  top: 0;
+  z-index: 20;
 }
 
 .content-area {
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 24px;
+  padding: 28px;
 }
 
 /* ========== 通用子页面样式 ========== */
 .page-wrapper {
-  animation: fadeIn 0.3s ease;
+  animation: fadeIn 0.35s ease;
   max-width: 1600px;
+  margin: 0 auto;
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(6px); }
+  from { opacity: 0; transform: translateY(8px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
@@ -122,7 +132,7 @@ html, body, #app {
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
-  margin-bottom: 20px;
+  margin-bottom: 22px;
   flex-wrap: wrap;
   gap: 12px;
 }
@@ -131,6 +141,7 @@ html, body, #app {
   font-size: 22px;
   font-weight: 700;
   color: var(--color-text-main);
+  letter-spacing: -0.3px;
 }
 
 .page-header .page-desc {
@@ -141,22 +152,26 @@ html, body, #app {
 
 .panel {
   background: #ffffff;
-  border-radius: 12px;
-  padding: 20px;
-  box-shadow: 0 2px 12px 0 rgba(58, 123, 213, 0.06);
+  border-radius: var(--radius-lg);
+  padding: 22px;
+  box-shadow: var(--shadow-card);
   border: 1px solid var(--color-border-light);
+  transition: box-shadow 0.2s ease;
 }
 
 /* ========== Element Plus 组件定制 ========== */
 :deep(.el-table) {
   font-size: 13px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
 }
 
 :deep(.el-table th.el-table__cell) {
-  background: #f5f8fb !important;
+  background: #f8fafc !important;
   color: var(--color-text-main) !important;
   font-weight: 600;
-  font-size: 13px;
+  font-size: 12.5px;
+  letter-spacing: 0.3px;
 }
 
 :deep(.el-table--border::after),
@@ -165,73 +180,109 @@ html, body, #app {
 }
 
 :deep(.el-button--primary) {
-  background: var(--color-primary);
-  border-color: var(--color-primary);
+  background: var(--color-primary-gradient);
+  border: none;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.2s ease;
 }
 
 :deep(.el-button--primary:hover) {
-  background: var(--color-primary-dark);
-  border-color: var(--color-primary-dark);
+  background: linear-gradient(135deg, var(--color-primary-dark), var(--color-primary));
+  box-shadow: 0 4px 12px rgba(79, 110, 247, 0.35);
+  transform: translateY(-1px);
+}
+
+:deep(.el-button--default) {
+  border-radius: 8px;
+  font-weight: 500;
 }
 
 :deep(.el-input__wrapper) {
-  border-radius: 6px;
+  border-radius: 8px;
   box-shadow: 0 0 0 1px var(--color-border) inset;
+  transition: box-shadow 0.2s ease;
 }
 
 :deep(.el-input__wrapper.is-focus) {
+  box-shadow: 0 0 0 2px var(--color-primary) inset;
+}
+
+:deep(.el-input__wrapper:hover) {
   box-shadow: 0 0 0 1px var(--color-primary) inset;
 }
 
+:deep(.el-select .el-input__wrapper) {
+  border-radius: 8px;
+}
+
 :deep(.el-dialog) {
-  border-radius: 12px;
+  border-radius: 16px;
   overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12);
 }
 
 :deep(.el-dialog__header) {
-  padding: 18px 24px;
+  padding: 20px 24px;
   border-bottom: 1px solid var(--color-border-light);
 }
 
 :deep(.el-dialog__body) {
-  padding: 22px 24px;
+  padding: 24px;
 }
 
 :deep(.el-dialog__footer) {
-  padding: 14px 24px 18px;
+  padding: 16px 24px 20px;
   border-top: 1px solid var(--color-border-light);
 }
 
 :deep(.el-tag) {
-  border-radius: 4px;
+  border-radius: 6px;
+  border: none;
+  font-weight: 500;
 }
 
 :deep(.el-divider__text) {
   color: var(--color-text-secondary);
   font-size: 13px;
+  font-weight: 600;
 }
 
 :deep(.el-pagination) {
   font-weight: 400;
 }
 
-/* 课程表 */
+:deep(.el-pagination button:hover) {
+  color: var(--color-primary);
+}
+
+:deep(.el-pager li.active) {
+  color: var(--color-primary);
+  font-weight: 700;
+}
+
+:deep(.el-menu--vertical) {
+  border-right: none !important;
+}
+
+/* ========== 课程表 ========== */
 .schedule-table {
   width: 100%;
   border-collapse: separate;
   border-spacing: 1px;
   background: var(--color-border-light);
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   overflow: hidden;
   font-size: 13px;
 }
 
 .schedule-table th {
-  background: #f5f8fb;
+  background: #f8fafc;
   color: var(--color-text-main);
   padding: 10px 8px;
   font-weight: 600;
   text-align: center;
+  font-size: 12.5px;
 }
 
 .schedule-table td {
@@ -243,7 +294,7 @@ html, body, #app {
 
 .schedule-cell {
   min-height: 60px;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   padding: 8px 10px;
   display: flex;
   flex-direction: column;
@@ -268,31 +319,36 @@ html, body, #app {
   margin-top: 2px;
 }
 
-.schedule-cell.course-blue   { background: linear-gradient(135deg, #dbe9fb, #e8f1fb); color: #2e5fa8; }
-.schedule-cell.course-green  { background: linear-gradient(135deg, #d9f2e6, #e6f9f7); color: #2d8f6f; }
-.schedule-cell.course-orange { background: linear-gradient(135deg, #fde8cd, #fef4e6); color: #b07030; }
-.schedule-cell.course-purple  { background: linear-gradient(135deg, #e8dbf5, #f3ebfb); color: #6b4a9a; }
-.schedule-cell.course-pink    { background: linear-gradient(135deg, #fadce6, #fbeaf0); color: #a8446a; }
+.schedule-cell.course-blue   { background: linear-gradient(135deg, #dbe9fb, #eef1ff); color: #3b55d9; }
+.schedule-cell.course-green  { background: linear-gradient(135deg, #d9f2e6, #ecfdf5); color: #16a34a; }
+.schedule-cell.course-orange { background: linear-gradient(135deg, #fde8cd, #fff7ed); color: #c2410c; }
+.schedule-cell.course-purple  { background: linear-gradient(135deg, #e8dbf5, #f5f3ff); color: #7c3aed; }
+.schedule-cell.course-pink    { background: linear-gradient(135deg, #fadce6, #fdf2f8); color: #db2777; }
 
 /* 通用卡片悬浮 */
 .el-card {
-  border-radius: 12px !important;
-  border: none !important;
-  box-shadow: 0 2px 12px 0 rgba(58, 123, 213, 0.06) !important;
+  border-radius: var(--radius-lg) !important;
+  border: 1px solid var(--color-border-light) !important;
+  box-shadow: var(--shadow-card) !important;
+  transition: all 0.2s ease !important;
 }
 
-.el-card__body { padding: 20px !important; }
+.el-card:hover {
+  box-shadow: var(--shadow-hover) !important;
+}
+
+.el-card__body { padding: 22px !important; }
 
 /* ========== 首页专属样式 ========== */
 .home-welcome {
-  background: linear-gradient(135deg, #1a3a5c 0%, #2e5fa8 50%, #3a7bd5 100%);
-  border-radius: 14px;
-  padding: 28px 32px;
+  background: linear-gradient(135deg, #4f6ef7 0%, #6c5ce7 50%, #a78bfa 100%);
+  border-radius: var(--radius-xl);
+  padding: 32px 36px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 24px;
-  box-shadow: 0 4px 20px rgba(26, 58, 92, 0.25);
+  margin-bottom: 26px;
+  box-shadow: 0 8px 30px rgba(79, 110, 247, 0.25);
   position: relative;
   overflow: hidden;
 }
@@ -300,51 +356,51 @@ html, body, #app {
 .home-welcome::before {
   content: '';
   position: absolute;
-  right: -20px;
-  top: -20px;
-  width: 160px;
-  height: 160px;
-  background: rgba(255, 255, 255, 0.06);
+  right: -30px;
+  top: -30px;
+  width: 200px;
+  height: 200px;
+  background: rgba(255, 255, 255, 0.07);
   border-radius: 50%;
 }
 
 .home-welcome::after {
   content: '';
   position: absolute;
-  right: 60px;
-  bottom: -40px;
-  width: 100px;
-  height: 100px;
-  background: rgba(255, 255, 255, 0.04);
+  right: 70px;
+  bottom: -50px;
+  width: 130px;
+  height: 130px;
+  background: rgba(255, 255, 255, 0.05);
   border-radius: 50%;
 }
 
 .welcome-text { position: relative; z-index: 1; }
 
 .welcome-title {
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 700;
   color: #ffffff;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
   letter-spacing: 0.5px;
 }
 
 .welcome-sub {
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.75);
-  margin-bottom: 10px;
-  max-width: 560px;
-  line-height: 1.7;
+  font-size: 13.5px;
+  color: rgba(255, 255, 255, 0.78);
+  margin-bottom: 12px;
+  max-width: 600px;
+  line-height: 1.8;
 }
 
 .welcome-time {
-  font-size: 12px;
+  font-size: 12.5px;
   color: rgba(255, 255, 255, 0.55);
 }
 
 .welcome-deco {
-  font-size: 72px;
-  opacity: 0.18;
+  font-size: 80px;
+  opacity: 0.15;
   position: relative;
   z-index: 1;
   flex-shrink: 0;
@@ -354,30 +410,32 @@ html, body, #app {
   font-size: 15px;
   font-weight: 700;
   color: var(--color-text-main);
-  margin-bottom: 12px;
+  margin-bottom: 14px;
   padding-left: 4px;
 }
 
 .stat-card-home {
-  border-radius: 10px;
-  padding: 18px 16px;
+  border-radius: var(--radius-md);
+  padding: 20px 16px;
   text-align: center;
-  transition: all 0.2s ease;
+  transition: all 0.25s ease;
+  border: 1px solid transparent;
 }
 
 .stat-card-home:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-hover);
+  border-color: rgba(79, 110, 247, 0.12);
 }
 
 .quick-card {
-  transition: all 0.2s ease;
+  transition: all 0.25s ease;
 }
 
 .quick-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
-  border-color: rgba(58, 123, 213, 0.3) !important;
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: var(--shadow-hover);
+  border-color: rgba(79, 110, 247, 0.2) !important;
 }
 
 .panel-section-title {
@@ -385,18 +443,73 @@ html, body, #app {
   font-weight: 700;
   color: var(--color-text-main);
   margin-bottom: 14px;
-  padding-bottom: 10px;
+  padding-bottom: 12px;
   border-bottom: 1px solid var(--color-border-light);
+}
+
+/* ========== AI 分析内容样式 ========== */
+.ai-analysis-content {
+  padding: 4px 0;
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+.ai-analysis-content h1,
+.ai-analysis-content h2,
+.ai-analysis-content h3 {
+  color: var(--color-text-main);
+  margin-top: 20px;
+  margin-bottom: 10px;
+}
+
+.ai-analysis-content h2 {
+  font-size: 17px;
+  border-bottom: 1px solid var(--color-border-light);
+  padding-bottom: 8px;
+}
+
+.ai-analysis-content ul,
+.ai-analysis-content ol {
+  padding-left: 22px;
+  margin: 8px 0;
+}
+
+.ai-analysis-content li {
+  margin: 4px 0;
+  color: var(--color-text-regular);
+}
+
+.ai-analysis-content code {
+  background: #f1f5f9;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 13px;
+  color: var(--color-danger);
+}
+
+.ai-analysis-content strong {
+  color: var(--color-text-main);
+}
+
+/* ========== AI 能力卡片悬浮 ========== */
+.ai-cap-card {
+  border: 2px solid transparent !important;
+}
+
+.ai-cap-card:hover {
+  transform: translateY(-3px) !important;
+  box-shadow: var(--shadow-hover) !important;
+  border-color: rgba(79, 110, 247, 0.15) !important;
 }
 
 /* ========== 响应式 ========== */
 @media (max-width: 992px) {
-  .sidebar { width: 190px !important; min-width: 190px; }
-  .content-area { padding: 16px; }
+  .sidebar { width: 200px !important; min-width: 200px; }
+  .content-area { padding: 18px; }
 }
 
 @media (max-width: 768px) {
   .sidebar { display: none; }
-  .content-area { padding: 12px; }
+  .content-area { padding: 14px; }
   .page-header { flex-direction: column; align-items: flex-start; }
 }
