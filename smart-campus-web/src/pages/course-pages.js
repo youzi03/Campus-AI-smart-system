@@ -605,7 +605,7 @@
       return {
         list: [],
         selectedWeek: '',
-        weekOptions: ['1-8周','1-9周','1-10周','1-11周','1-12周','1-13周','1-14周','1-15周','1-16周','1-17周','1-18周','2-17周','3-18周','9-16周'],
+        weekOptions: Array.from({length:18},(_,i)=>{return '第'+(i+1)+'周';}).concat(['1-8周','1-9周','1-10周','1-11周','1-12周','1-13周','1-14周','1-15周','1-16周','1-17周','1-18周','2-17周','3-18周','9-16周']),
         dayNames: CourseService.dayNames,
         periodNames: CourseService.periodNames,
         viewMode: 'grid'
@@ -614,7 +614,18 @@
     computed: {
       filteredList() {
         if (!this.selectedWeek) return this.list;
-        return this.list.filter(s => s.week === this.selectedWeek);
+        return this.list.filter(s => {
+          if (s.week === this.selectedWeek) return true;
+          var wk = this.selectedWeek.match(/^(\d+)周$/);
+          if (wk) {
+            var m = s.week.match(/^(\d+)-(\d+)周$/);
+            if (m) {
+              var n = parseInt(wk[1]);
+              return n >= parseInt(m[1]) && n <= parseInt(m[2]);
+            }
+          }
+          return false;
+        });
       },
       sortedList() { return [...this.list].sort((a, b) => a.day - b.day || a.period - b.period); },
       sortedFilteredList() { return [...this.filteredList].sort((a, b) => a.day - b.day || a.period - b.period); }
