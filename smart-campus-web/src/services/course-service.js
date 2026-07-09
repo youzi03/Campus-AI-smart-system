@@ -175,23 +175,71 @@
       if (!courses.length || !rooms.length) { Common.showMsg('请先添加课程和教室/实验室', 'warning'); return 0; }
       var existing = JSON.parse(localStorage.getItem('schedule')||'null')||scheduleSample;
       var created = 0;
+      var colors = ['blue','green','orange','purple','pink'];
+
+      // 统计已有排课的各时间段占用
+      function countSlot(day, period, week) {
+        return existing.filter(function(s){return s.day===day && s.period===period && s.week===week;}).length;
+      }
+      function countWeeklyHours(week) {
+        return existing.filter(function(s){return s.week===week;}).length * 2;
+      }
+      function teacherBusy(tid, day, period, week) {
+        return existing.some(function(s){return s.teacherId===tid && s.day===day && s.period===period && s.week===week;});
+      }
+      function roomBusy(rid, day, period, week) {
+        return existing.some(function(s){return s.roomId===rid && s.day===day && s.period===period && s.week===week;});
+      }
+
+      var totalWeekRanges = ['1-16周','1-17周','1-18周','1-19周','1-20周'];
+      var weekIdx = 0;
+      var week = totalWeekRanges[weekIdx];
+
       courses.forEach(function(course, idx) {
+        // 每门课安排2个时间段
         for (var t = 0; t < 2; t++) {
           var placed = false;
-          for (var day = 1; day <= 5 && !placed; day++) {
-            for (var period = 1; period <= 4 && !placed; period++) {
-              if (existing.some(function(s){return s.courseId===course.id&&s.day===day&&s.period===period;})) continue;
-              var room = rooms[(idx + day + period) % rooms.length];
-              if (existing.some(function(s){return s.roomId===room.id&&s.day===day&&s.period===period;})) continue;
-              if (existing.some(function(s){return s.teacherId===course.teacherId&&s.day===day&&s.period===period;})) continue;
-              existing.push({id:Common.uid('SCH'),courseId:course.id,courseName:course.name,teacherId:course.teacherId,teacherName:course.teacher,day:day,period:period,roomId:room.id,roomName:room.name,classGroup:'自动排课',week:'1-16周',color:['blue','green','orange','purple','pink'][idx%5]});
-              created++; placed = true;
+          // 从第1周开始，依次尝试
+          for (var wi = 0; wi < totalWeekRanges.length && !placed; wi++) {
+            var wk = totalWeekRanges[wi];
+            for (var day = 1; day <= 5 && !placed; day++) {
+              for (var period = 1; period <= 4 && !placed; period++) {
+                // 该时间段课程数不超过2
+                if (countSlot(day, period, wk) >= 2) continue;
+                // 教师不冲突
+                if (teacherBusy(course.teacherId, day, period, wk)) continue;
+                // 找空闲教室
+                var room = null;
+                for (var ri = 0; ri < rooms.length; ri++) {
+                  if (!roomBusy(rooms[ri].id, day, period, wk)) {
+                    room = rooms[ri];
+                    break;
+                  }
+                }
+                if (!room) continue;
+                // 周学时不超过48
+                if (countWeeklyHours(wk) >= 48) continue;
+
+                existing.push({
+                  id: Common.uid('SCH'),
+                  courseId: course.id, courseName: course.name,
+                  teacherId: course.teacherId, teacherName: course.teacher,
+                  day: day, period: period,
+                  roomId: room.id, roomName: room.name,
+                  classGroup: '自动排课',
+                  week: wk,
+                  color: colors[idx % 5]
+                });
+                created++;
+                placed = true;
+              }
             }
           }
         }
       });
+
       localStorage.setItem('schedule', JSON.stringify(existing));
-      Common.showMsg('智能排课完成，共生成 '+created+' 条', 'success');
+      Common.showMsg('智能排课完成，共生成 ' + created + ' 条', 'success');
       return created;
     },
     clearSchedule() { localStorage.setItem('schedule','[]'); Common.showMsg('课表已清空','warning'); },
