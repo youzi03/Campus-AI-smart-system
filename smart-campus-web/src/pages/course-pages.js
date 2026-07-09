@@ -605,7 +605,7 @@
       return {
         list: [],
         selectedWeek: '',
-        weekOptions: Array.from({length:18},(_,i)=>{return '第'+(i+1)+'周';}).concat(['1-8周','1-9周','1-10周','1-11周','1-12周','1-13周','1-14周','1-15周','1-16周','1-17周','1-18周','2-17周','3-18周','9-16周']),
+        weekOptions: Array.from({length:18},(_,i)=>{return '第'+(i+1)+'周';}),
         dayNames: CourseService.dayNames,
         periodNames: CourseService.periodNames,
         viewMode: 'grid'
