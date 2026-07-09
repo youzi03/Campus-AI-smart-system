@@ -543,11 +543,14 @@
             <div class="page-desc">可视化查看一周所有时段的课程安排</div>
           </div>
           <div style="display:flex;gap:10px;align-items:center">
+            <el-select v-model="selectedWeek" placeholder="全部周次" clearable size="small" style="width:130px">
+              <el-option v-for="w in weekOptions" :key="w" :label="w" :value="w" />
+            </el-select>
             <el-radio-group v-model="viewMode" size="small">
               <el-radio-button label="grid">表格视图</el-radio-button>
               <el-radio-button label="list">列表视图</el-radio-button>
             </el-radio-group>
-            <el-tag effect="plain" type="info">共 {{ list.length }} 条排课</el-tag>
+            <el-tag effect="plain" type="info">共 {{ filteredList.length }} 条排课</el-tag>
           </div>
         </div>
 
@@ -566,7 +569,7 @@
                   <div style="font-size:12px;color:#909399;margin-top:4px">{{ p.time }}</div>
                 </td>
                 <td v-for="(d,di) in dayNames" :key="d" style="background:#fff;padding:6px;vertical-align:top">
-                  <div v-for="item in itemsAt(di+1, p.p)" :key="item.id"
+                  <div v-for="item in filteredItemsAt(di+1, p.p)" :key="item.id"
                        @click="showDetail(item)"
                        style="padding:10px 12px;border-radius:8px;margin-bottom:6px;cursor:pointer;transition:all 0.2s"
                        :style="{background:colorBg(item.color), color:colorText(item.color), borderLeft: '3px solid ' + colorHex(item.color)}">
@@ -582,7 +585,7 @@
         </div>
 
         <div v-else class="panel">
-          <el-table :data="sortedList" border stripe style="width:100%">
+          <el-table :data="sortedFilteredList" border stripe style="width:100%">
             <el-table-column label="星期" width="100">
               <template #default="s"><el-tag size="small" type="primary" effect="plain">{{ dayNames[s.row.day-1] }}</el-tag></template>
             </el-table-column>
@@ -601,18 +604,26 @@
     data() {
       return {
         list: [],
+        selectedWeek: '',
+        weekOptions: ['1-8周','1-9周','1-10周','1-11周','1-12周','1-13周','1-14周','1-15周','1-16周','1-17周','1-18周','2-17周','3-18周','9-16周'],
         dayNames: CourseService.dayNames,
         periodNames: CourseService.periodNames,
         viewMode: 'grid'
       };
     },
     computed: {
-      sortedList() { return [...this.list].sort((a, b) => a.day - b.day || a.period - b.period); }
+      filteredList() {
+        if (!this.selectedWeek) return this.list;
+        return this.list.filter(s => s.week === this.selectedWeek);
+      },
+      sortedList() { return [...this.list].sort((a, b) => a.day - b.day || a.period - b.period); },
+      sortedFilteredList() { return [...this.filteredList].sort((a, b) => a.day - b.day || a.period - b.period); }
     },
     created() { this.load(); },
     methods: {
       async load() { this.list = await CourseService.getSchedule(); },
       itemsAt(day, period) { return this.list.filter(s => s.day === day && s.period === period); },
+      filteredItemsAt(day, period) { return this.filteredList.filter(s => s.day === day && s.period === period); },
       colorHex(c) { return { blue: '#409eff', green: '#67c23a', orange: '#e6a23c', purple: '#8b5cf6', pink: '#ec4899' }[c] || '#409eff'; },
       colorBg(c) {
         const map = { blue: '#ecf5ff', green: '#f0f9eb', orange: '#fdf6ec', purple: '#f5f0ff', pink: '#fef0f5' };
