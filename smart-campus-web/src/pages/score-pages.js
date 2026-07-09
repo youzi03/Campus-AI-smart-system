@@ -387,7 +387,7 @@
       },
       maxBarVal() { return Math.max.apply(null, this.scoreBars.map(b => b.value).concat([1])); }
     },
-    created() { this.list = ScoreService.getScores(); },
+    created() { this.list = await ScoreService.getScores(); },
     methods: {
       avgTag(avg) {
         const a = Number(avg);
