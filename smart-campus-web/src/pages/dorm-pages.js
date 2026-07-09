@@ -131,7 +131,7 @@
               </el-form-item></el-col>
               <el-col :span="8"><el-form-item label="容量"><el-input-number v-model.number="roomForm.capacity" :min="1" style="width:100%" /></el-form-item></el-col>
               <el-col :span="8"><el-form-item label="性别">
-                <el-radio-group v-model="roomForm.gender"><el-radio value="男">男</el-radio><el-radio value="女">女</el-radio></el-radio-group>
+                <el-radio-group v-model="roomForm.gender"><el-radio label="男">男</el-radio><el-radio label="女">女</el-radio></el-radio-group>
               </el-form-item></el-col>
               <el-col :span="8"><el-form-item label="住宿费"><el-input-number v-model.number="roomForm.fee" :min="0" style="width:100%" /></el-form-item></el-col>
               <el-col :span="12"><el-form-item label="状态">

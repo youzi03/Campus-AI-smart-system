@@ -57,9 +57,9 @@
                   <el-option v-for="c in collegeOptions" :key="c" :label="c" :value="c" />
                 </el-select>
               </el-form-item></el-col>
-              <el-col :span="8"><el-form-item label="学分"><el-input-number v-model.number="form.credit" :min="1" :max="10" style="width:100%" /></el-form-item></el-col>
-              <el-col :span="8"><el-form-item label="学时"><el-input-number v-model.number="form.hours" :min="1" style="width:100%" /></el-form-item></el-col>
-              <el-col :span="8"><el-form-item label="容量"><el-input-number v-model.number="form.capacity" :min="1" style="width:100%" /></el-form-item></el-col>
+              <el-col :span="8"><el-form-item label="学分"><el-input-number v-model="form.credit" :min="1" :max="10" controls-position="right" style="width:100%" /></el-form-item></el-col>
+              <el-col :span="8"><el-form-item label="学时"><el-input-number v-model="form.hours" :min="1" :max="200" controls-position="right" style="width:100%" /></el-form-item></el-col>
+              <el-col :span="8"><el-form-item label="容量"><el-input-number v-model="form.capacity" :min="1" :max="500" controls-position="right" style="width:100%" /></el-form-item></el-col>
               <el-col :span="24"><el-form-item label="学期"><el-input v-model="form.semester" placeholder="如 2025-2026春" /></el-form-item></el-col>
             </el-row>
           </el-form>
@@ -176,8 +176,8 @@
               <el-col :span="12"><el-form-item label="教室编号"><el-input v-model="form.id" :disabled="dialog.mode==='edit'" /></el-form-item></el-col>
               <el-col :span="12"><el-form-item label="教室名称"><el-input v-model="form.name" /></el-form-item></el-col>
               <el-col :span="8"><el-form-item label="楼栋"><el-input v-model="form.building" placeholder="如 A栋" /></el-form-item></el-col>
-              <el-col :span="8"><el-form-item label="楼层"><el-input-number v-model.number="form.floor" :min="1" style="width:100%" /></el-form-item></el-col>
-              <el-col :span="8"><el-form-item label="容量"><el-input-number v-model.number="form.capacity" :min="1" style="width:100%" /></el-form-item></el-col>
+              <el-col :span="8"><el-form-item label="楼层"><el-input-number v-model="form.floor" :min="1" controls-position="right" style="width:100%" /></el-form-item></el-col>
+              <el-col :span="8"><el-form-item label="容量"><el-input-number v-model="form.capacity" :min="1" :max="500" controls-position="right" style="width:100%" /></el-form-item></el-col>
               <el-col :span="12"><el-form-item label="类型">
                 <el-select v-model="form.type" style="width:100%">
                   <el-option label="多媒体教室" value="多媒体教室" />
@@ -303,14 +303,14 @@
               <el-col :span="12"><el-form-item label="编号"><el-input v-model="form.id" :disabled="dialog.mode==='edit'" /></el-form-item></el-col>
               <el-col :span="12"><el-form-item label="名称"><el-input v-model="form.name" /></el-form-item></el-col>
               <el-col :span="8"><el-form-item label="楼栋"><el-input v-model="form.building" /></el-form-item></el-col>
-              <el-col :span="8"><el-form-item label="楼层"><el-input-number v-model.number="form.floor" :min="1" style="width:100%" /></el-form-item></el-col>
-              <el-col :span="8"><el-form-item label="容量"><el-input-number v-model.number="form.capacity" :min="1" style="width:100%" /></el-form-item></el-col>
+              <el-col :span="8"><el-form-item label="楼层"><el-input-number v-model="form.floor" :min="1" controls-position="right" style="width:100%" /></el-form-item></el-col>
+              <el-col :span="8"><el-form-item label="容量"><el-input-number v-model="form.capacity" :min="1" :max="500" controls-position="right" style="width:100%" /></el-form-item></el-col>
               <el-col :span="12"><el-form-item label="类型">
                 <el-select v-model="form.type" style="width:100%">
                   <el-option v-for="t in ['计算机实验室','物理实验室','化学实验室','电子实验室','生物实验室']" :key="t" :label="t" :value="t" />
                 </el-select>
               </el-form-item></el-col>
-              <el-col :span="12"><el-form-item label="PC数量"><el-input-number v-model.number="form.pcCount" :min="0" style="width:100%" /></el-form-item></el-col>
+              <el-col :span="12"><el-form-item label="PC数量"><el-input-number v-model="form.pcCount" :min="0" controls-position="right" style="width:100%" /></el-form-item></el-col>
               <el-col :span="12"><el-form-item label="管理员"><el-input v-model="form.manager" /></el-form-item></el-col>
               <el-col :span="12"><el-form-item label="联系电话"><el-input v-model="form.phone" /></el-form-item></el-col>
               <el-col :span="12"><el-form-item label="状态">

@@ -105,7 +105,7 @@
               <el-col :span="12"><el-form-item label="学号"><el-input v-model="form.id" :disabled="dialog.mode==='edit'" /></el-form-item></el-col>
               <el-col :span="12"><el-form-item label="姓名"><el-input v-model="form.name" /></el-form-item></el-col>
               <el-col :span="12"><el-form-item label="性别">
-                <el-radio-group v-model="form.gender"><el-radio value="男">男</el-radio><el-radio value="女">女</el-radio></el-radio-group>
+                <el-radio-group v-model="form.gender"><el-radio label="男">男</el-radio><el-radio label="女">女</el-radio></el-radio-group>
               </el-form-item></el-col>
               <el-col :span="12"><el-form-item label="出生日期"><el-input v-model="form.birth" placeholder="如 2005-08-12" /></el-form-item></el-col>
               <el-col :span="12"><el-form-item label="学院">
@@ -399,7 +399,7 @@
             <el-row :gutter="16">
               <el-col :span="12"><el-form-item label="工号"><el-input v-model="form.id" :disabled="dialog.mode==='edit'" /></el-form-item></el-col>
               <el-col :span="12"><el-form-item label="姓名"><el-input v-model="form.name" /></el-form-item></el-col>
-              <el-col :span="12"><el-form-item label="性别"><el-radio-group v-model="form.gender"><el-radio value="男">男</el-radio><el-radio value="女">女</el-radio></el-radio-group></el-form-item></el-col>
+              <el-col :span="12"><el-form-item label="性别"><el-radio-group v-model="form.gender"><el-radio label="男">男</el-radio><el-radio label="女">女</el-radio></el-radio-group></el-form-item></el-col>
               <el-col :span="12"><el-form-item label="职称"><el-select v-model="form.title" style="width:100%"><el-option v-for="t in titleOptions" :key="t" :label="t" :value="t" /></el-select></el-form-item></el-col>
               <el-col :span="12"><el-form-item label="学院"><el-select v-model="form.college" style="width:100%"><el-option v-for="c in collegeOptions" :key="c" :label="c" :value="c" /></el-select></el-form-item></el-col>
               <el-col :span="12"><el-form-item label="专业方向"><el-input v-model="form.major" /></el-form-item></el-col>

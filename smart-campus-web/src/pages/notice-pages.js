@@ -80,9 +80,9 @@
           <el-form label-width="100px">
             <el-form-item label="类型">
               <el-radio-group v-model="form.type">
-                <el-radio value="通知">通知</el-radio>
-                <el-radio value="重要">重要</el-radio>
-                <el-radio value="预警">预警</el-radio>
+                <el-radio label="通知">通知</el-radio>
+                <el-radio label="重要">重要</el-radio>
+                <el-radio label="预警">预警</el-radio>
               </el-radio-group>
             </el-form-item>
             <el-form-item label="标题"><el-input v-model="form.title" placeholder="请输入公告标题" maxlength="80" /></el-form-item>
@@ -176,9 +176,9 @@
           <el-form :model="form" label-width="100px">
             <el-form-item label="公告类型">
               <el-radio-group v-model="form.type">
-                <el-radio value="通知">📢 通知</el-radio>
-                <el-radio value="重要">❗ 重要</el-radio>
-                <el-radio value="预警">⚠️ 预警</el-radio>
+                <el-radio label="通知">📢 通知</el-radio>
+                <el-radio label="重要">❗ 重要</el-radio>
+                <el-radio label="预警">⚠️ 预警</el-radio>
               </el-radio-group>
             </el-form-item>
             <el-form-item label="标题">
