@@ -49,7 +49,26 @@
       catch{var list=JSON.parse(localStorage.getItem('dormAllocs')||'null')||allocSample;var idx=list.findIndex(function(x){return x.id===id;});if(idx>=0){list[idx].status='已退宿';list[idx].checkOut=Common.today();localStorage.setItem('dormAllocs',JSON.stringify(list));}Common.showMsg('已退宿');}
     },
     async getStats() { try{return await apiClient.get('/dorm-rooms/stats');}catch{var list=JSON.parse(localStorage.getItem('dormRooms')||'null')||roomSample;var used=list.filter(function(r){return r.status==='使用中';}).length;return{total:list.length,used:used,free:list.length-used};} },
-    async roomCount() { try{var s=await this.getStats();return s.total;}catch{return(JSON.parse(localStorage.getItem('dormRooms')||'null')||roomSample).length;} }
+    async roomCount() { try{var s=await this.getStats();return s.total;}catch{return(JSON.parse(localStorage.getItem('dormRooms')||'null')||roomSample).length;} },
+    /** 按楼栋统计 */
+    async getBuildingStats() {
+      var rooms = await this.getRooms();
+      var allocs = await this.getAllocations();
+      var map = {};
+      rooms.forEach(function(r) {
+        if (!map[r.building]) map[r.building] = { building: r.building, total: 0, capacity: 0, occupied: 0 };
+        map[r.building].total++;
+        map[r.building].capacity += r.capacity || 0;
+      });
+      allocs.filter(function(a){return a.status === '在住';}).forEach(function(a) {
+        var room = rooms.find(function(r){return r.id === a.roomId;});
+        if (room && map[room.building]) map[room.building].occupied++;
+      });
+      return Object.values(map).map(function(b) {
+        b.usage = b.capacity > 0 ? (b.occupied / b.capacity * 100).toFixed(1) + '%' : '0%';
+        return b;
+      });
+    }
   };
   global.DormService = DormService;
 })(window);
