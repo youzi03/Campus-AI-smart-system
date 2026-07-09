@@ -2,6 +2,7 @@ package com.campus.ai.service;
 
 import com.campus.ai.common.BusinessException;
 import com.campus.ai.common.ResourceNotFoundException;
+import com.campus.ai.common.UserContext;
 import com.campus.ai.entity.OpLog;
 import com.campus.ai.entity.Student;
 import com.campus.ai.entity.Teacher;
@@ -26,6 +27,7 @@ public class UserService {
     private final StudentRepository studentRepository;
     private final TeacherRepository teacherRepository;
     private final OpLogRepository opLogRepository;
+    private final AuthService authService;
 
     // ==================== 操作日志 ====================
 
@@ -34,7 +36,7 @@ public class UserService {
         log.setType(type);
         log.setTarget(target);
         log.setTargetId(targetId);
-        log.setOperator("管理员");
+        log.setOperator(UserContext.getCurrentUser());
         log.setDetail(detail);
         log.setTime(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
         opLogRepository.save(log);
@@ -79,6 +81,14 @@ public class UserService {
         }
         if (s.getStatus() == null) s.setStatus("在读");
         Student saved = studentRepository.save(s);
+
+        // 同步创建登录账号（默认密码=学号）
+        try {
+            authService.createAccount(s.getId(), s.getId(), "student", s.getName(), s.getPhone());
+        } catch (Exception e) {
+            log.warn("创建学生账号失败（不影响学生信息保存）: {}", e.getMessage());
+        }
+
         addOpLog("新增", "学生", s.getId(), "新增学生：" + s.getName() + "（" + s.getCollege() + " " + s.getMajor() + "）");
         log.info("新增学生: {} {}", s.getId(), s.getName());
         return saved;
@@ -117,7 +127,7 @@ public class UserService {
         String oldStatus = s.getStatus();
         s.setStatus(newStatus);
         s.setStatusChangeAt(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-        s.setStatusOperator("管理员");
+        s.setStatusOperator(UserContext.getCurrentUser());
         Student saved = studentRepository.save(s);
         addOpLog("状态变更", "学生", id, s.getName() + "：" + oldStatus + " → " + newStatus);
         log.info("学生状态变更: {} {} → {}", id, oldStatus, newStatus);
@@ -187,6 +197,14 @@ public class UserService {
             throw new BusinessException("工号已存在：" + t.getId());
         }
         Teacher saved = teacherRepository.save(t);
+
+        // 同步创建登录账号（默认密码=工号）
+        try {
+            authService.createAccount(t.getId(), t.getId(), "teacher", t.getName(), t.getPhone());
+        } catch (Exception e) {
+            log.warn("创建教师账号失败（不影响教师信息保存）: {}", e.getMessage());
+        }
+
         addOpLog("新增", "教师", t.getId(), "新增教师：" + t.getName() + "（" + t.getCollege() + " " + t.getTitle() + "）");
         log.info("新增教师: {} {}", t.getId(), t.getName());
         return saved;

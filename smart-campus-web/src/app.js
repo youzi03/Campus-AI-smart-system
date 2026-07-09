@@ -1,11 +1,11 @@
 /* ============================================================
  * 主应用 app.js - Vue 3 单页应用（Element Plus）
- * 模块化页面组件 + 侧边栏菜单
+ * 模块化页面组件 + 侧边栏菜单 + 角色权限控制
  * ============================================================ */
 
-const { createApp, ref, reactive, computed, onMounted, onBeforeUnmount } = Vue;
+const { createApp, ref, reactive, computed, onMounted } = Vue;
 
-/* ========== 应用配置 ========== */
+/* ========== 应用配置（含角色权限） ========== */
 const AppConfig = {
   title: '校园信息管理系统',
   version: '1.0.0',
@@ -14,57 +14,63 @@ const AppConfig = {
     {
       title: '用户信息',
       icon: '\u{1F465}',
+      roles: ['admin'],
       items: [
-        { key: 'student-list', title: '学生信息', icon: '\u{1F393}' },
-        { key: 'student-batch', title: '学生批量录入', icon: '\u{1F4E5}' },
-        { key: 'teacher-list', title: '教师信息', icon: '\u{1F9D1}\u200D\u{1F3EB}' },
-        { key: 'teacher-batch', title: '教师批量录入', icon: '\u{1F4E5}' },
-        { key: 'op-log', title: '操作日志', icon: '\u{1F4CB}' }
+        { key: 'student-list', title: '学生信息', icon: '\u{1F393}', roles: ['admin'] },
+        { key: 'student-batch', title: '学生批量录入', icon: '\u{1F4E5}', roles: ['admin'] },
+        { key: 'teacher-list', title: '教师信息', icon: '\u{1F9D1}\u200D\u{1F3EB}', roles: ['admin'] },
+        { key: 'teacher-batch', title: '教师批量录入', icon: '\u{1F4E5}', roles: ['admin'] },
+        { key: 'op-log', title: '操作日志', icon: '\u{1F4CB}', roles: ['admin'] }
       ]
     },
     {
       title: '课程服务',
       icon: '\u{1F4DA}',
+      roles: ['admin', 'teacher', 'student'],
       items: [
-        { key: 'course', title: '课程管理', icon: '\u{1F4D6}' },
-        { key: 'classroom', title: '教室管理', icon: '\u{1F3EB}' },
-        { key: 'lab', title: '实验室管理', icon: '\u{1F52C}' },
-        { key: 'teaching-task', title: '教学任务', icon: '\u{1F4CB}' },
-        { key: 'schedule', title: '课表查看', icon: '\u{1F5D3}' }
+        { key: 'course', title: '课程管理', icon: '\u{1F4D6}', roles: ['admin', 'teacher'] },
+        { key: 'classroom', title: '教室管理', icon: '\u{1F3EB}', roles: ['admin', 'teacher'] },
+        { key: 'lab', title: '实验室管理', icon: '\u{1F52C}', roles: ['admin', 'teacher'] },
+        { key: 'teaching-task', title: '教学任务', icon: '\u{1F4CB}', roles: ['admin', 'teacher'] },
+        { key: 'schedule', title: '课表查看', icon: '\u{1F5D3}', roles: ['admin', 'teacher', 'student'] }
       ]
     },
     {
       title: '成绩服务',
       icon: '\u{1F4CA}',
+      roles: ['admin', 'teacher', 'student'],
       items: [
-        { key: 'score-input', title: '成绩录入', icon: '\u270F' },
-        { key: 'score-query', title: '成绩查询', icon: '\u{1F50D}' },
-        { key: 'score-stat', title: '成绩统计', icon: '\u{1F4C8}' },
-        { key: 'score-warning', title: '成绩预警', icon: '\u26A0' }
+        { key: 'score-input', title: '成绩录入', icon: '\u270F', roles: ['admin', 'teacher'] },
+        { key: 'score-query', title: '成绩查询', icon: '\u{1F50D}', roles: ['admin', 'teacher', 'student'] },
+        { key: 'score-stat', title: '成绩统计', icon: '\u{1F4C8}', roles: ['admin', 'teacher', 'student'] },
+        { key: 'score-warning', title: '成绩预警', icon: '\u26A0', roles: ['admin', 'teacher', 'student'] }
       ]
     },
     {
       title: '公告服务',
       icon: '\u{1F4E2}',
+      roles: ['admin', 'teacher', 'student'],
       items: [
-        { key: 'notice-list', title: '公告列表', icon: '\u{1F4DD}' },
-        { key: 'notice-publish', title: '发布公告', icon: '\u{1F4E3}' },
-        { key: 'notice-warning', title: '预警消息', icon: '\u{1F514}' }
+        { key: 'notice-list', title: '公告列表', icon: '\u{1F4DD}', roles: ['admin', 'teacher', 'student'] },
+        { key: 'notice-publish', title: '发布公告', icon: '\u{1F4E3}', roles: ['admin', 'teacher'] },
+        { key: 'notice-warning', title: '预警消息', icon: '\u{1F514}', roles: ['admin', 'teacher', 'student'] }
       ]
     },
     {
       title: '宿舍服务',
       icon: '\u{1F3E0}',
+      roles: ['admin'],
       items: [
-        { key: 'dorm', title: '宿舍管理', icon: '\u{1F9CF}' }
+        { key: 'dorm', title: '宿舍管理', icon: '\u{1F9CF}', roles: ['admin'] }
       ]
     },
     {
       title: '图书馆服务',
       icon: '\u{1F4DA}',
+      roles: ['admin', 'teacher', 'student'],
       items: [
-        { key: 'library-book', title: '书籍管理', icon: '\u{1F4DA}' },
-        { key: 'library-borrow', title: '借阅管理', icon: '\u{1F4D6}' }
+        { key: 'library-book', title: '书籍管理', icon: '\u{1F4DA}', roles: ['admin', 'teacher', 'student'] },
+        { key: 'library-borrow', title: '借阅管理', icon: '\u{1F4D6}', roles: ['admin', 'teacher', 'student'] }
       ]
     }
   ]
@@ -77,14 +83,27 @@ const App = {
     const currentTitle = ref('首页');
     const now = ref(Common.today());
 
-    // 统计数据（异步加载）
+    // 当前登录用户
+    const currentUser = Auth.getUser();
+    const userName = ref(currentUser ? (currentUser.realName || (currentUser.profile && currentUser.profile.name) || currentUser.username) : '管理员');
+    const userRole = ref(currentUser ? currentUser.role : 'admin');
+
+    // ========== 菜单权限过滤 ==========
+    const visibleMenuGroups = computed(() => {
+      const role = userRole.value;
+      return AppConfig.menuGroups
+        .filter(g => !g.roles || g.roles.includes(role))
+        .map(g => ({
+          ...g,
+          items: g.items.filter(item => !item.roles || item.roles.includes(role))
+        }))
+        .filter(g => g.items.length > 0);
+    });
+
+    // ========== 统计数据 ==========
     const stats = reactive({
-      studentCount: 0,
-      teacherCount: 0,
-      courseCount: 0,
-      scoreCount: 0,
-      noticeCount: 0,
-      roomCount: 0
+      studentCount: 0, teacherCount: 0, courseCount: 0,
+      scoreCount: 0, noticeCount: 0, roomCount: 0
     });
 
     const recentNotices = ref([]);
@@ -95,24 +114,24 @@ const App = {
         try { stats.studentCount = await UserService.studentCount(); } catch {}
         try { stats.teacherCount = await UserService.teacherCount(); } catch {}
       }
-      if (CourseService && CourseService.courseCount) {
-        try { stats.courseCount = await CourseService.courseCount(); } catch {}
+      if (window.CourseService && window.CourseService.courseCount) {
+        try { stats.courseCount = await window.CourseService.courseCount(); } catch {}
       }
-      if (ScoreService && ScoreService.scoreCount) {
-        try { stats.scoreCount = await ScoreService.scoreCount(); } catch {}
+      if (window.ScoreService && window.ScoreService.scoreCount) {
+        try { stats.scoreCount = await window.ScoreService.scoreCount(); } catch {}
       }
-      if (NoticeService && NoticeService.noticeCount) {
-        try { stats.noticeCount = await NoticeService.noticeCount(); } catch {}
+      if (window.NoticeService && window.NoticeService.noticeCount) {
+        try { stats.noticeCount = await window.NoticeService.noticeCount(); } catch {}
       }
-      if (DormService && DormService.roomCount) {
-        try { stats.roomCount = await DormService.roomCount(); } catch {}
+      if (window.DormService && window.DormService.roomCount) {
+        try { stats.roomCount = await window.DormService.roomCount(); } catch {}
       }
     }
 
     async function loadRecentData() {
-      if (NoticeService && NoticeService.getNotices) {
-        try { 
-          const notices = await NoticeService.getNotices();
+      if (window.NoticeService && window.NoticeService.getNotices) {
+        try {
+          const notices = await window.NoticeService.getNotices();
           recentNotices.value = (notices || []).slice(0, 5);
         } catch {}
       }
@@ -124,12 +143,12 @@ const App = {
       }
     }
 
-    // 挂载时加载数据
     onMounted(() => {
       loadStats();
       loadRecentData();
     });
 
+    // ========== 路由 ==========
     const switchMenu = (key) => {
       currentPage.value = key;
       for (const g of AppConfig.menuGroups) {
@@ -140,9 +159,20 @@ const App = {
       window.scrollTo && window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
+    // ========== 登出 ==========
+    const handleLogout = () => {
+      ElementPlus.ElMessageBox.confirm('确定要退出登录吗？', '退出确认', { type: 'info', confirmButtonText: '退出', cancelButtonText: '取消' })
+        .then(() => { Auth.logout(); })
+        .catch(() => {});
+    };
+
     window.$app = { switchMenu };
 
-    return { currentPage, currentTitle, now, switchMenu, AppConfig, stats, recentNotices, recentLogs };
+    return {
+      currentPage, currentTitle, now, switchMenu,
+      AppConfig, visibleMenuGroups, stats, recentNotices, recentLogs,
+      userName, userRole, handleLogout
+    };
   },
   components: {},
   template: `
@@ -165,6 +195,7 @@ const App = {
         </div>
         <el-divider style="margin:6px 12px;border-color:rgba(255,255,255,0.1)" />
 
+        <!-- 按角色过滤的菜单 -->
         <el-menu
           :default-active="currentPage"
           @select="switchMenu"
@@ -174,7 +205,7 @@ const App = {
           style="border-right:none;background:transparent;flex:1"
           class="sidebar-menu"
         >
-          <el-sub-menu v-for="(group, gi) in AppConfig.menuGroups" :key="gi" :index="'g-' + gi">
+          <el-sub-menu v-for="(group, gi) in visibleMenuGroups" :key="gi" :index="'g-' + gi">
             <template #title><span style="font-size:15px">{{ group.icon }} {{ group.title }}</span></template>
             <el-menu-item v-for="item in group.items" :key="item.key" :index="item.key">
               <span>{{ item.icon }} {{ item.title }}</span>
@@ -193,10 +224,19 @@ const App = {
             <el-tooltip content="&#28857;&#20987;&#21047;&#26032;&#24403;&#21069;&#39029;&#38754;" placement="bottom">
               <el-icon :size="20" @click="switchMenu(currentPage)" style="cursor:pointer;color:#606266">&#128260;</el-icon>
             </el-tooltip>
-            <div style="display:flex;align-items:center;gap:8px;padding:4px 12px;background:#f0f7ff;border-radius:20px;">
-              <div style="font-size:20px">&#128100;</div>
-              <div style="font-size:14px;color:#303133;font-weight:500">&#31649;&#29702;&#21592;</div>
-            </div>
+            <!-- 用户信息 + 登出 -->
+            <el-dropdown trigger="click" @command="handleLogout">
+              <div style="display:flex;align-items:center;gap:8px;padding:4px 12px;background:#f0f7ff;border-radius:20px;cursor:pointer">
+                <div style="font-size:20px">&#128100;</div>
+                <div style="font-size:14px;color:#303133;font-weight:500">{{ userName }}</div>
+                <el-tag size="small" :type="userRole==='admin'?'danger':userRole==='teacher'?'warning':'success'" effect="plain" style="margin-left:2px">{{ {admin:'管理员',teacher:'教师',student:'学生'}[userRole] || userRole }}</el-tag>
+              </div>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item command="logout" style="color:#f56c6c">&#128682; 退出登录</el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
           </div>
         </header>
 
@@ -207,7 +247,7 @@ const App = {
               <div class="welcome-text">
                 <div class="welcome-title">&#127891; &#27426;&#36814;&#20351;&#29992;&#26234;&#25000;&#26657;&#22253;&#20449;&#24687;&#31649;&#29702;&#31995;&#32479;</div>
                 <div class="welcome-sub">&#25972;&#21512;&#23398;&#29983;&#31649;&#29702;&#12289;&#35838;&#31243;&#25490;&#35838;&#12289;&#25104;&#32489;&#32479;&#35745;&#12289;&#20844;&#21578;&#21457;&#24067;&#12289;&#23487;&#20250;&#20998;&#37197;&#12289;&#22270;&#20070;&#20511;&#38405;&#31561;&#26680;&#24515;&#27169;&#22359;&#65292;&#21161;&#21147;&#26657;&#22253;&#25968;&#23383;&#21270;&#31649;&#29702;</div>
-                <div class="welcome-time">{{ now }} &nbsp;&middot;&nbsp; &#22825;&#27668;&#26222;&#26126;&#37011;&#22635;&nbsp;&middot;&nbsp; &#25945;&#23398;&#21608;&#31532; 8 &#21608;</div>
+                <div class="welcome-time">{{ now }} &nbsp;&middot;&nbsp; &#27426;&#36814;&#24744;&#65292;{{ userName }}</div>
               </div>
               <div class="welcome-deco">&#127891;</div>
             </div>
@@ -215,13 +255,13 @@ const App = {
             <div class="home-section-title">&#9889; &#24555;&#25463;&#20837;&#21475;</div>
             <el-row :gutter="14" style="margin-bottom:20px">
               <el-col :span="4" v-for="(item, idx) in [
-                {key:'student-list', title:'&#23398;&#29983;&#20449;&#24687;', icon:'&#127894;', color:'#e8f1fb', textColor:'#2e5fa8'},
-                {key:'score-input', title:'&#25104;&#32489;&#24405;&#20837;', icon:'&#9998;', color:'#e6f9f7', textColor:'#2d8f6f'},
-                {key:'notice-publish', title:'&#21457;&#24067;&#20844;&#21578;', icon:'&#128227;', color:'#fef0f0', textColor:'#c44a6a'},
-                {key:'schedule', title:'&#26597;&#30475;&#35838;&#34920;', icon:'&#128197;', color:'#f5f0ff', textColor:'#6b4a9a'},
-                {key:'dorm', title:'&#23487;&#20250;&#31649;&#29702;', icon:'&#128719;', color:'#e8f5f9', textColor:'#2a7a9a'},
-                {key:'library-book', title:'&#22270;&#20070;&#31649;&#29702;', icon:'&#128218;', color:'#fef4e6', textColor:'#b07030'}
-              ]" :key="idx">
+                {key:'student-list', title:'&#23398;&#29983;&#20449;&#24687;', icon:'&#127894;', color:'#e8f1fb', textColor:'#2e5fa8', roles:['admin']},
+                {key:'score-input', title:'&#25104;&#32489;&#24405;&#20837;', icon:'&#9998;', color:'#e6f9f7', textColor:'#2d8f6f', roles:['admin','teacher']},
+                {key:'notice-publish', title:'&#21457;&#24067;&#20844;&#21578;', icon:'&#128227;', color:'#fef0f0', textColor:'#c44a6a', roles:['admin','teacher']},
+                {key:'schedule', title:'&#26597;&#30475;&#35838;&#34920;', icon:'&#128197;', color:'#f5f0ff', textColor:'#6b4a9a', roles:['admin','teacher','student']},
+                {key:'dorm', title:'&#23487;&#20250;&#31649;&#29702;', icon:'&#128719;', color:'#e8f5f9', textColor:'#2a7a9a', roles:['admin']},
+                {key:'library-book', title:'&#22270;&#20070;&#31649;&#29702;', icon:'&#128218;', color:'#fef4e6', textColor:'#b07030', roles:['admin','teacher','student']}
+              ].filter(x => !x.roles || x.roles.includes(userRole))" :key="idx">
                 <div
                   @click="switchMenu(item.key)"
                   :style="'padding:18px 12px;border-radius:10px;text-align:center;cursor:pointer;transition:all 0.2s;background:' + item.color + ';border:1px solid transparent'"
@@ -285,23 +325,16 @@ const App = {
                   <div class="panel-section-title">&#128226; &#26368;&#26032;&#20844;&#21578;</div>
                   <div v-if="recentNotices.length === 0" style="color:#c0c4cc;text-align:center;padding:20px 0;font-size:13px">&#26242;&#26080;&#20844;&#21578;</div>
                   <div v-else>
-                    <div
-                      v-for="(n, i) in recentNotices"
-                      :key="i"
+                    <div v-for="(n, i) in recentNotices" :key="i"
                       style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #f0f0f0;cursor:pointer"
                       :style="i === recentNotices.length - 1 ? 'border-bottom:none' : ''"
-                      @click="switchMenu('notice-list')"
-                    >
+                      @click="switchMenu('notice-list')">
                       <div style="width:8px;height:8px;border-radius:50%;background:#3a7bd5;flex-shrink:0"></div>
                       <div style="flex:1;min-width:0">
                         <div style="font-size:13px;color:#303133;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ n.title }}</div>
                         <div style="font-size:12px;color:#909399;margin-top:2px">{{ n.time || n.createAt }}</div>
                       </div>
-                      <el-tag size="small" :type="n.priority==='高'?'danger':n.priority==='中'?'warning':'info'" effect="plain">{{ n.priority || '&#26242;&#36890;' }}</el-tag>
                     </div>
-                  </div>
-                  <div style="text-align:center;margin-top:10px">
-                    <el-button size="small" plain @click="switchMenu('notice-list')" style="color:#3a7bd5;border-color:#3a7bd5">&#26597;&#30475;&#20840;&#37096;&#20844;&#21578; &#8594;</el-button>
                   </div>
                 </div>
               </el-col>
@@ -310,18 +343,14 @@ const App = {
                   <div class="panel-section-title">&#128203; &#26368;&#36817;&#25805;&#20316;</div>
                   <div v-if="recentLogs.length === 0" style="color:#c0c4cc;text-align:center;padding:20px 0;font-size:13px">&#26242;&#26080;&#25805;&#20316;&#35760;&#24405;</div>
                   <div v-else>
-                    <div
-                      v-for="(log, i) in recentLogs"
-                      :key="i"
+                    <div v-for="(log, i) in recentLogs" :key="i"
                       style="display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid #f0f0f0"
-                      :style="i === recentLogs.length - 1 ? 'border-bottom:none' : ''"
-                    >
+                      :style="i === recentLogs.length - 1 ? 'border-bottom:none' : ''">
                       <div style="width:6px;height:6px;border-radius:50%;background:#3a7bd5;flex-shrink:0;margin-top:6px"></div>
                       <div style="flex:1;min-width:0">
                         <div style="font-size:13px;color:#303133">{{ log.detail }}</div>
                         <div style="font-size:12px;color:#909399;margin-top:2px">{{ log.time }}</div>
                       </div>
-                      <el-tag size="small" :type="log.type==='&#26032;&#22686;'?'success':log.type==='&#32534;&#36753;'?'warning':log.type==='&#21024;&#38500;'?'danger':'info'" effect="plain" style="flex-shrink:0">{{ log.type }}</el-tag>
                     </div>
                   </div>
                 </div>
@@ -335,24 +364,19 @@ const App = {
           <page-user-teacher v-else-if="currentPage==='teacher-list'"></page-user-teacher>
           <page-user-teacher-batch v-else-if="currentPage==='teacher-batch'"></page-user-teacher-batch>
           <page-op-log v-else-if="currentPage==='op-log'"></page-op-log>
-
           <page-course v-else-if="currentPage==='course'"></page-course>
           <page-classroom v-else-if="currentPage==='classroom'"></page-classroom>
           <page-lab v-else-if="currentPage==='lab'"></page-lab>
           <page-teaching-task v-else-if="currentPage==='teaching-task'"></page-teaching-task>
           <page-schedule v-else-if="currentPage==='schedule'"></page-schedule>
-
           <page-score-input v-else-if="currentPage==='score-input'"></page-score-input>
           <page-score-query v-else-if="currentPage==='score-query'"></page-score-query>
           <page-score-stat v-else-if="currentPage==='score-stat'"></page-score-stat>
           <page-score-warning v-else-if="currentPage==='score-warning'"></page-score-warning>
-
           <page-notice-list v-else-if="currentPage==='notice-list'"></page-notice-list>
           <page-notice-publish v-else-if="currentPage==='notice-publish'"></page-notice-publish>
           <page-notice-warning v-else-if="currentPage==='notice-warning'"></page-notice-warning>
-
           <page-dorm v-else-if="currentPage==='dorm'"></page-dorm>
-
           <page-library-book v-else-if="currentPage==='library-book'"></page-library-book>
           <page-library-borrow v-else-if="currentPage==='library-borrow'"></page-library-borrow>
         </section>

@@ -28,6 +28,11 @@ spring:
         dialect: org.hibernate.dialect.MySQLDialect
         format_sql: true
 
+# JWT 配置
+jwt:
+  secret: CampusAi2024SmartSystemSecretKeyForJWTTokenGenerationMustBe256BitsLong
+  expiration: 86400000  # 24 小时（毫秒）
+
 # 日志配置
 logging:
   level:

@@ -1,26 +1,43 @@
 /* ============================================================
  * API 客户端 — 封装 fetch 请求，对接后端 RESTful API
- * 统一错误处理、自动 JSON 序列化/反序列化
+ * 统一错误处理、自动 JSON 序列化/反序列化、JWT 鉴权
  * ============================================================ */
 (function (global) {
 
   const API_BASE = 'http://localhost:8080/api';
 
   /**
+   * 获取 Authorization 请求头
+   */
+  function getAuthHeader() {
+    if (global.Auth) {
+      const token = global.Auth.getToken();
+      if (token) return { 'Authorization': 'Bearer ' + token };
+    }
+    return {};
+  }
+
+  /**
    * 核心请求方法
-   * @param {string} url    路径（如 /students）
-   * @param {object} opts   fetch 选项
-   * @returns {Promise<any>} 解析后的 data 字段
    */
   async function request(url, opts = {}) {
     try {
       const response = await fetch(API_BASE + url, {
         headers: {
           'Content-Type': 'application/json',
+          ...getAuthHeader(),
           ...(opts.headers || {})
         },
         ...opts
       });
+
+      // 处理 401 未授权
+      if (response.status === 401) {
+        if (global.Auth) {
+          global.Auth.logout(); // 清除 token，刷新回到登录页
+        }
+        throw new Error('登录已过期，请重新登录');
+      }
 
       // 处理非 JSON 响应
       const contentType = response.headers.get('content-type') || '';
@@ -44,7 +61,7 @@
 
       return result.data;
     } catch (err) {
-      // 网络错误或解析错误
+      // 网络错误
       if (err.name === 'TypeError' && err.message.includes('fetch')) {
         const netMsg = '无法连接后端服务器，请确认服务已启动';
         if (global.ElementPlus) {
@@ -53,7 +70,7 @@
         throw new Error(netMsg);
       }
       // 已在上面提示过的错误不再重复提示
-      if (!err.message.includes('请求失败')) {
+      if (!err.message.includes('请求失败') && !err.message.includes('登录已过期')) {
         if (global.ElementPlus) {
           global.ElementPlus.ElMessage.error(err.message || '网络错误');
         }

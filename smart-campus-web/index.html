@@ -11,19 +11,206 @@
   <!-- 自定义样式 -->
   <link rel="stylesheet" href="src/styles/theme.css" />
   <link rel="stylesheet" href="src/styles/main.css" />
+
+  <!-- 登录页样式 -->
+  <style>
+    /* ========== 登录页面 ========== */
+    #login-page {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #1a3a5c 0%, #2e5fa8 50%, #3a7bd5 100%);
+      position: relative;
+      overflow: hidden;
+    }
+
+    #login-page::before {
+      content: '';
+      position: absolute;
+      width: 600px;
+      height: 600px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.04);
+      top: -200px;
+      right: -150px;
+    }
+
+    #login-page::after {
+      content: '';
+      position: absolute;
+      width: 400px;
+      height: 400px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.03);
+      bottom: -100px;
+      left: -100px;
+    }
+
+    .login-card {
+      position: relative;
+      z-index: 1;
+      width: 420px;
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 40px 36px 32px;
+      box-shadow: 0 20px 60px rgba(26, 58, 92, 0.3);
+      animation: loginFadeIn 0.5s ease;
+    }
+
+    @keyframes loginFadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .login-logo {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .login-logo .icon {
+      font-size: 48px;
+      display: block;
+      margin-bottom: 10px;
+    }
+
+    .login-logo h1 {
+      font-size: 22px;
+      font-weight: 700;
+      color: #2c3e50;
+      margin: 0 0 4px 0;
+      letter-spacing: 1px;
+    }
+
+    .login-logo p {
+      font-size: 13px;
+      color: #909399;
+      margin: 0;
+    }
+
+    .login-form .el-input__wrapper {
+      padding: 4px 12px;
+      height: 42px;
+    }
+
+    .login-form .el-input__prefix {
+      font-size: 18px;
+      margin-right: 6px;
+    }
+
+    .login-btn {
+      width: 100%;
+      height: 44px;
+      font-size: 16px;
+      letter-spacing: 1px;
+      margin-top: 6px;
+      border-radius: 8px;
+      background: linear-gradient(90deg, #3a7bd5, #4a8de0);
+      border: none;
+    }
+
+    .login-btn:hover {
+      background: linear-gradient(90deg, #2e5fa8, #3a7bd5);
+    }
+
+    .login-error {
+      margin-top: 12px;
+      text-align: center;
+      font-size: 13px;
+      color: #f56c6c;
+      min-height: 20px;
+    }
+
+    .login-footer {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 12px;
+      color: #c0c4cc;
+    }
+
+    .login-test-accounts {
+      margin-top: 16px;
+      padding: 12px 16px;
+      background: #f5f8fb;
+      border-radius: 8px;
+      font-size: 12px;
+      color: #606266;
+      line-height: 1.8;
+    }
+
+    .login-test-accounts .label {
+      font-weight: 600;
+      color: #303133;
+      margin-bottom: 4px;
+    }
+
+    .login-test-accounts code {
+      background: #e8f1fb;
+      padding: 1px 6px;
+      border-radius: 3px;
+      font-size: 11px;
+      color: #3a7bd5;
+    }
+  </style>
 </head>
 <body>
-  <div id="app">
+
+  <!-- ========== 登录页面 ========== -->
+  <div id="login-page">
+    <div class="login-card">
+      <div class="login-logo">
+        <div class="icon">🎓</div>
+        <h1>智慧校园管理系统</h1>
+        <p>Smart Campus Information System v1.0</p>
+      </div>
+
+      <div class="login-form">
+        <el-form ref="loginFormRef" :model="loginForm" :rules="loginRules" @keyup.enter="handleLogin">
+          <el-form-item prop="username">
+            <el-input v-model="loginForm.username" placeholder="请输入用户名" size="large">
+              <template #prefix>👤</template>
+            </el-input>
+          </el-form-item>
+
+          <el-form-item prop="password">
+            <el-input v-model="loginForm.password" type="password" placeholder="请输入密码" size="large" show-password>
+              <template #prefix>🔒</template>
+            </el-input>
+          </el-form-item>
+
+          <el-form-item>
+            <el-button class="login-btn" type="primary" size="large" :loading="loading" @click="handleLogin">
+              {{ loading ? '登录中...' : '登 录' }}
+            </el-button>
+          </el-form-item>
+        </el-form>
+
+        <div class="login-error">{{ errorMsg }}</div>
+
+        <div class="login-test-accounts">
+          <div class="label">🔑 测试账号</div>
+          <div>管理员：<code>admin</code> / <code>Admin@2024</code></div>
+          <div>教师：<code>T001</code> / <code>T001</code>（工号为密码）</div>
+          <div>学生：<code>2025001</code> / <code>2025001</code>（学号为密码）</div>
+        </div>
+      </div>
+
+      <div class="login-footer">© 2026 Smart Campus · All Rights Reserved</div>
+    </div>
+  </div>
+
+  <!-- ========== 主应用（登录后可见） ========== -->
+  <div id="app" style="display:none">
     <div style="padding:40px;text-align:center;color:#909399;font-size:14px">
       🎓 智慧校园信息管理系统正在加载中...
     </div>
   </div>
 
-  <!-- Vue 3 + Element Plus + Icons (CDN, IIFE 模式) -->
-  <script src="https://unpkg.com/vue@3.4.0/dist/vue.global.js"></script>
+  <!-- Vue 3 + Element Plus + Icons (CDN, IIFE) -->
+  <script src="https://unpkg.com/vue@3.4.0/dist/vue.global.prod.js"></script>
   <script src="https://unpkg.com/element-plus@2.4.4/dist/index.full.js"></script>
   <script src="https://unpkg.com/@element-plus/icons-vue@2.3.1/dist/index.iife.js"></script>
-  <!-- SheetJS (XLSX) - Excel 文件解析 -->
+  <!-- SheetJS (XLSX) -->
   <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
 
   <!-- 通用工具 -->
@@ -32,7 +219,10 @@
   <!-- API 客户端（封装 fetch，对接后端 REST API） -->
   <script src="src/services/api-client.js"></script>
 
-  <!-- 服务层（按业务拆分，对应后端服务） -->
+  <!-- 认证服务（需在 api-client 之后、其他服务之前加载） -->
+  <script src="src/services/auth.js"></script>
+
+  <!-- 服务层 -->
   <script src="src/services/user-service.js"></script>
   <script src="src/services/course-service.js"></script>
   <script src="src/services/score-service.js"></script>
@@ -40,7 +230,7 @@
   <script src="src/services/dorm-service.js"></script>
   <script src="src/services/library-service.js"></script>
 
-  <!-- 页面组件（按服务拆分，一个服务一个文件） -->
+  <!-- 页面组件 -->
   <script src="src/pages/course-pages.js"></script>
   <script src="src/pages/score-pages.js"></script>
   <script src="src/pages/notice-pages.js"></script>
@@ -52,5 +242,49 @@
 
   <!-- 主应用 -->
   <script src="src/app.js"></script>
+
+  <!-- ========== 登录页 Vue 实例（IIFE 避免与 app.js 变量冲突） ========== -->
+  <script>
+    (function () {
+      if (Auth.isLoggedIn()) {
+        document.getElementById('login-page').style.display = 'none';
+        document.getElementById('app').style.display = 'block';
+        return;
+      }
+
+      var loginForm = Vue.reactive({ username: '', password: '' });
+      var loading = Vue.ref(false);
+      var errorMsg = Vue.ref('');
+
+      function handleLogin() {
+        errorMsg.value = '';
+        if (!loginForm.username || !loginForm.password) {
+          errorMsg.value = '请输入用户名和密码';
+          return;
+        }
+        loading.value = true;
+        Auth.login(loginForm.username, loginForm.password)
+          .then(function () {
+            document.getElementById('login-page').style.display = 'none';
+            document.getElementById('app').style.display = 'block';
+            window.location.reload();
+          })
+          .catch(function (err) {
+            errorMsg.value = err.message || '登录失败，请检查用户名和密码';
+          })
+          .finally(function () {
+            loading.value = false;
+          });
+      }
+
+      var loginApp = Vue.createApp({
+        setup: function () {
+          return { loginForm: loginForm, loading: loading, errorMsg: errorMsg, handleLogin: handleLogin };
+        }
+      });
+      loginApp.use(ElementPlus);
+      loginApp.mount('#login-page');
+    })();
+  </script>
 </body>
 </html>
