@@ -130,11 +130,11 @@
     },
     created() { this.load(); },
     methods: {
-      load() { this.list = NoticeService.getNotices(); },
+      async load() { this.list = await NoticeService.getNotices(); },
       typeTag(t) { return t === '重要' ? 'danger' : (t === '预警' ? 'warning' : 'primary'); },
       showDetail(row) {
         row.views = (row.views || 0) + 1;
-        NoticeService.saveNotices(this.list);
+        localStorage.setItem('notices', JSON.stringify(this.list));
         this.detail = Object.assign({ show: true }, row);
       },
       openAdd() {
@@ -323,7 +323,7 @@
       async load() { this.list = await NoticeService.getNotices(); },
       showDetail(row) {
         row.views = (row.views || 0) + 1;
-        NoticeService.saveNotices(this.list);
+        localStorage.setItem('notices', JSON.stringify(this.list));
         this.detail = Object.assign({ show: true }, row);
       },
       pushOne(row) {

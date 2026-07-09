@@ -389,6 +389,7 @@ const App = {
 /* 不使用自动挂载，由登录脚本在登录成功后调用 window.initApp() */
 window.initApp = function () {
   var app = createApp(App);
+  app.config.errorHandler = function (err) { console.error('[Vue Error]', err); };
   app.use(ElementPlus);
   app.component('page-user-student', UserPages.PageUserStudent);
   app.component('page-user-student-batch', UserPages.PageUserStudentBatch);

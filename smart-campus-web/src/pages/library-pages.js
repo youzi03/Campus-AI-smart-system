@@ -125,8 +125,10 @@
     created() { this.load(); },
     methods: {
       async load() {
-        this.books = await LibraryService.getBooks();
-        this.borrows = await LibraryService.getBorrows();
+        try {
+          this.books = await LibraryService.getBooks();
+          this.borrows = await LibraryService.getBorrows();
+        } catch(e) { console.error(e); }
       },
       openAdd() {
         this.dialog.mode = 'add';
@@ -230,7 +232,7 @@
             </el-form-item>
             <el-form-item label="选择书籍">
               <el-select v-model="form.bookId" filterable style="width:100%" @change="onBookChange">
-                <el-option v-for="b in availableBooks" :key="b.id" :label="b.id + ' 《' + b.title + '》 (' + b.available + '/' + b.total + '可借)" :value="b.id" />
+                <el-option v-for="b in availableBooks" :key="b.id" :label="b.id + ' - ' + b.title + ' [' + b.available + '/' + b.total + ']'" :value="b.id" />
               </el-select>
             </el-form-item>
             <el-form-item label="借阅日期">
@@ -272,9 +274,11 @@
     created() { this.load(); },
     methods: {
       async load() {
-        this.borrows = await LibraryService.getBorrows();
-        this.books = await LibraryService.getBooks();
-        this.students = await UserService.getStudents();
+        try {
+          this.borrows = await LibraryService.getBorrows();
+          this.books = await LibraryService.getBooks();
+          this.students = await UserService.getStudents();
+        } catch(e) { console.error(e); }
       },
       openBorrow() {
         this.form = { studentId: '', studentName: '', bookId: '', bookTitle: '', borrowDate: Common.today(), remark: '' };
