@@ -221,6 +221,7 @@ public class UserService {
         if (t.getMajor() != null) existing.setMajor(t.getMajor());
         if (t.getPhone() != null) existing.setPhone(t.getPhone());
         if (t.getEmail() != null) existing.setEmail(t.getEmail());
+        if (t.getManagedClass() != null) existing.setManagedClass(t.getManagedClass());
         if (t.getJoinYear() != null) existing.setJoinYear(t.getJoinYear());
         Teacher saved = teacherRepository.save(existing);
         addOpLog("编辑", "教师", id, "编辑教师：" + saved.getName());

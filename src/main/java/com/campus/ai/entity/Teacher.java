@@ -44,6 +44,10 @@ public class Teacher {
     @Column(length = 100)
     private String email;
 
+    /** 管理的班级（同专业班级） */
+    @Column(length = 200)
+    private String managedClass;
+
     @Column(length = 10)
     private Integer joinYear;
 

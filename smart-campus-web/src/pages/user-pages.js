@@ -381,6 +381,7 @@
             <el-table-column prop="major" label="专业方向" width="150" />
             <el-table-column prop="phone" label="联系电话" width="140" />
             <el-table-column prop="email" label="邮箱" width="180" />
+            <el-table-column prop="managedClass" label="管理班级" min-width="200" />
             <el-table-column prop="joinYear" label="入职年份" width="100" align="center" />
             <el-table-column label="操作" width="150" fixed="right">
               <template #default="s">
