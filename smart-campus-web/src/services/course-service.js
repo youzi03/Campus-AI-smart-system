@@ -140,7 +140,6 @@
       catch { return JSON.parse(localStorage.getItem('schedule')||'null')||scheduleSample; }
     },
     async addScheduleItem(item) {
-      if (!item.id) item.id = Common.uid('SCH');
       try { return await apiClient.post('/schedules', item); }
       catch {
         var list=JSON.parse(localStorage.getItem('schedule')||'null')||scheduleSample;
