@@ -49,6 +49,11 @@
       try{return await apiClient.put('/dorm-allocations/'+id+'/checkout');}
       catch{var list=JSON.parse(localStorage.getItem('dormAllocs')||'null')||allocSample;var idx=list.findIndex(function(x){return x.id===id;});if(idx>=0){list[idx].status='已退宿';list[idx].checkOut=Common.today();localStorage.setItem('dormAllocs',JSON.stringify(list));}Common.showMsg('已退宿');}
     },
+    async deleteAllocation(id) {
+      if (!id) { Common.showMsg('记录ID无效', 'error'); return; }
+      try{return await apiClient.del('/dorm-allocations/'+id);}
+      catch{var list=JSON.parse(localStorage.getItem('dormAllocs')||'null')||allocSample;var idx=list.findIndex(function(x){return x.id===id;});if(idx>=0){list.splice(idx,1);localStorage.setItem('dormAllocs',JSON.stringify(list));}Common.showMsg('已删除');}
+    },
     async getStats() { try{return await apiClient.get('/dorm-rooms/stats');}catch{var list=JSON.parse(localStorage.getItem('dormRooms')||'null')||roomSample;var used=list.filter(function(r){return r.status==='使用中';}).length;return{total:list.length,used:used,free:list.length-used};} },
     async roomCount() { try{var s=await this.getStats();return s.total;}catch{return(JSON.parse(localStorage.getItem('dormRooms')||'null')||roomSample).length;} },
     /** 按楼栋统计 */

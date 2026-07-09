@@ -32,4 +32,6 @@ public class DormController {
     public ApiResult<DormAllocation> assignRoom(@RequestBody Map<String,String> body) { return ApiResult.success(dormService.assignRoom(body.get("roomId"), body.get("studentId"), body.get("studentName"))); }
     @PutMapping("/dorm-allocations/{id}/checkout")
     public ApiResult<Void> checkOut(@PathVariable String id) { dormService.checkOut(id); return ApiResult.success(); }
+    @DeleteMapping("/dorm-allocations/{id}")
+    public ApiResult<Void> deleteAllocation(@PathVariable String id) { dormService.deleteAllocation(id); return ApiResult.success(); }
 }

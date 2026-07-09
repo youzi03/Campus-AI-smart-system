@@ -54,6 +54,10 @@ public class DormService {
         a.setStatus("已退宿"); a.setCheckOut(java.time.LocalDate.now().toString());
         dormAllocationRepository.save(a);
     }
+    @Transactional public void deleteAllocation(String id) {
+        dormAllocationRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("分配记录不存在"));
+        dormAllocationRepository.deleteById(id);
+    }
     public List<DormAllocation> getAllocations(String roomId) {
         if (roomId != null) return dormAllocationRepository.findByRoomId(roomId);
         return dormAllocationRepository.findAll();

@@ -264,9 +264,12 @@
       async checkOut(row) {
         try { await ElementPlus.ElMessageBox.confirm('确定为学生【' + row.studentName + '】办理退房？', '退房确认', { type: 'warning' }); await DormService.checkOut(row.id); await this.load(); } catch {}
       },
-      confirmDeleteAlloc(row) {
-        ElementPlus.ElMessageBox.confirm('确定删除分配记录？', '删除确认', { type: 'warning' })
-          .then(() => { DormService.deleteAllocation(row.id); this.load(); }).catch(() => {});
+      async confirmDeleteAlloc(row) {
+        try {
+          await ElementPlus.ElMessageBox.confirm('确定删除分配记录？', '删除确认', { type: 'warning' });
+          await DormService.deleteAllocation(row.id);
+          await this.load();
+        } catch {}
       }
     }
   };
