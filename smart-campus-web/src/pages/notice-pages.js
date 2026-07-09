@@ -143,18 +143,21 @@
         this.dialog.show = true;
       },
       openEdit(row) { this.dialog.mode = 'edit'; this.form = Object.assign({}, row); this.dialog.show = true; },
-      submit() {
+      async submit() {
         if (!this.form.title || !this.form.content) { Common.showMsg('标题和内容不能为空', 'warning'); return; }
-        if (this.dialog.mode === 'add') NoticeService.addNotice(this.form);
-        else NoticeService.updateNotice(this.form);
-        this.load();
+        if (this.dialog.mode === 'add') await NoticeService.addNotice(this.form);
+        else await NoticeService.updateNotice(this.form);
+        await this.load();
         this.dialog.show = false;
       },
-      togglePin(row) { NoticeService.togglePin(row.id); this.load(); },
-      pushNotice(row) { NoticeService.pushNotice(row.id); this.load(); },
-      confirmDelete(row) {
-        ElementPlus.ElMessageBox.confirm('确定删除公告【' + row.title + '】？', '删除确认', { type: 'warning' })
-          .then(() => { NoticeService.deleteNotice(row.id); this.load(); }).catch(() => {});
+      async togglePin(row) { await NoticeService.togglePin(row.id); await this.load(); },
+      pushNotice(row) { Common.showMsg('推送成功'); },
+      async confirmDelete(row) {
+        try {
+          await ElementPlus.ElMessageBox.confirm('确定删除【' + row.title + '】？', '确认', { type: 'warning' });
+          await NoticeService.deleteNotice(row.id);
+          await this.load();
+        } catch {}
       }
     }
   };
@@ -317,7 +320,7 @@
     },
     created() { this.load(); },
     methods: {
-      load() { this.list = NoticeService.getNotices(); },
+      async load() { this.list = await NoticeService.getNotices(); },
       showDetail(row) {
         row.views = (row.views || 0) + 1;
         NoticeService.saveNotices(this.list);

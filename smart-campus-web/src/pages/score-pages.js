@@ -85,10 +85,10 @@
     },
     created() { this.load(); },
     methods: {
-      load() {
-        this.list = ScoreService.getScores();
-        this.students = UserService.getStudents();
-        this.courses = CourseService.getCourses();
+      async load() {
+        this.list = await ScoreService.getScores();
+        this.students = await UserService.getStudents();
+        this.courses = await CourseService.getCourses();
       },
       scoreLevel(s) {
         if (s >= 90) return '优秀';
@@ -128,17 +128,20 @@
         this.form = Object.assign({}, row);
         this.dialog.show = true;
       },
-      submit() {
+      async submit() {
         if (!this.form.studentId || !this.form.courseId) { Common.showMsg('请选择学生和课程', 'warning'); return; }
         if (this.form.score < 0 || this.form.score > 100) { Common.showMsg('成绩必须在 0-100 之间', 'warning'); return; }
-        if (this.dialog.mode === 'add') ScoreService.addScore(this.form);
-        else ScoreService.updateScore(this.form);
-        this.load();
+        if (this.dialog.mode === 'add') await ScoreService.addScore(this.form);
+        else await ScoreService.updateScore(this.form);
+        await this.load();
         this.dialog.show = false;
       },
-      confirmDelete(row) {
-        ElementPlus.ElMessageBox.confirm('确定删除该成绩记录？', '删除确认', { type: 'warning' })
-          .then(() => { ScoreService.deleteScore(row.id); this.load(); }).catch(() => {});
+      async confirmDelete(row) {
+        try {
+          await ElementPlus.ElMessageBox.confirm('确定删除该成绩记录？', '删除确认', { type: 'warning' });
+          await ScoreService.deleteScore(row.id);
+          await this.load();
+        } catch {}
       }
     }
   };
@@ -231,9 +234,9 @@
     },
     created() { this.load(); },
     methods: {
-      load() {
-        this.list = ScoreService.getScores();
-        this.courses = CourseService.getCourses();
+      async load() {
+        this.list = await ScoreService.getScores();
+        this.courses = await CourseService.getCourses();
       },
       scoreLevel(s) {
         if (s >= 90) return '优秀';
@@ -344,7 +347,7 @@
           <el-table :data="studentRank" border stripe style="width:100%">
             <el-table-column type="index" label="排名" width="80" align="center">
               <template #default="s">
-                <span v-if="s.$index < 3" style="font-size:18px">🥇🥈🥉"[s.$index]</span>
+                <span v-if="s.$index < 3" style="font-size:18px">{{ ['🥇','🥈','🥉'][s.$index] }}</span>
                 <span v-else style="color:#909399;font-weight:600">{{ s.$index + 1 }}</span>
               </template>
             </el-table-column>
@@ -362,8 +365,8 @@
     `,
     data() { return { list: [] }; },
     computed: {
-      courseStats() { return ScoreService.statByCourse(); },
-      studentRank() { return ScoreService.statByStudent().slice(0, 10); },
+      courseStats() { return ScoreService.statByCourse(this.list); },
+      studentRank() { return ScoreService.statByStudent(this.list).slice(0, 10); },
       avgScore() {
         if (!this.list.length) return '0.0';
         return (this.list.reduce((sum, s) => sum + Number(s.score), 0) / this.list.length).toFixed(1);
@@ -375,7 +378,7 @@
       },
       failCount() { return this.list.filter(s => Number(s.score) < 60).length; },
       scoreBars() {
-        const raw = ScoreService.statByScoreRange();
+        const raw = ScoreService.statByScoreRange(this.list);
         const labels = ['0-59', '60-69', '70-79', '80-89', '90-100'];
         const descs = ['不及格', '及格', '中等', '良好', '优秀'];
         return raw.map((r, i) => ({ label: labels[i], desc: descs[i], value: r.value, color: {
@@ -509,7 +512,7 @@
         })).sort((a, b) => Number(b.failRate) - Number(a.failRate));
       }
     },
-    created() { this.list = ScoreService.getScores(); },
+    async created() { this.list = await ScoreService.getScores(); },
     methods: {
       generateNotice() {
         if (!this.failingScores.length) { Common.showMsg('当前没有不及格成绩，无需生成预警', 'info'); return; }

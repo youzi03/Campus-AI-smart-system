@@ -17,4 +17,5 @@ SELECT '已清理 4 张旧表 (uc_role, uc_permission, uc_role_permission, uc_us
 --   teacher        → Teacher.java
 --   op_log         → OpLog.java
 --   sys_user       → User.java（已有，系统登录用）
+--   registration_certificate → RegistrationCertificate.java
 -- =============================================================

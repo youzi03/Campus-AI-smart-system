@@ -216,10 +216,10 @@
     created() { this.load(); },
     methods: {
       getOccupancy(id) { return DormService.getRoomOccupancy(id); },
-      load() {
-        this.rooms = DormService.getRooms();
-        this.allocs = DormService.getAllocations();
-        this.students = UserService.getStudents();
+      async load() {
+        this.rooms = await DormService.getRooms();
+        this.allocs = await DormService.getAllocations();
+        this.students = await UserService.getStudents();
       },
       openAddRoom() {
         this.roomDialog.mode = 'add';
@@ -245,7 +245,7 @@
         const s = this.students.find(x => x.id === id);
         if (s) this.allocForm.studentName = s.name;
       },
-      submitAlloc() {
+      async submitAlloc() {
         if (!this.allocForm.studentId || !this.allocForm.roomId) { Common.showMsg('请选择学生和宿舍', 'warning'); return; }
         // 性别匹配校验
         const student = this.students.find(s => s.id === this.allocForm.studentId);
@@ -254,11 +254,11 @@
           Common.showMsg('性别不匹配！该宿舍为' + room.gender + '生宿舍，无法分配给' + student.gender + '生', 'error');
           return;
         }
-        if (DormService.allocateStudent(this.allocForm)) { this.load(); this.allocDialog.show = false; }
+        await DormService.assignRoom(this.allocForm);
+        await this.load(); this.allocDialog.show = false;
       },
-      checkOut(row) {
-        ElementPlus.ElMessageBox.confirm('确定为学生【' + row.studentName + '】办理退房？', '退房确认', { type: 'warning' })
-          .then(() => { DormService.checkOut(row.id); this.load(); }).catch(() => {});
+      async checkOut(row) {
+        try { await ElementPlus.ElMessageBox.confirm('确定为学生【' + row.studentName + '】办理退房？', '退房确认', { type: 'warning' }); await DormService.checkOut(row.id); await this.load(); } catch {}
       },
       confirmDeleteAlloc(row) {
         ElementPlus.ElMessageBox.confirm('确定删除分配记录？', '删除确认', { type: 'warning' })

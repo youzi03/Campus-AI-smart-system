@@ -386,8 +386,9 @@ const App = {
 };
 
 /* ========== 启动 Vue 应用 ========== */
-window.addEventListener('DOMContentLoaded', () => {
-  const app = createApp(App);
+/* 不使用自动挂载，由登录脚本在登录成功后调用 window.initApp() */
+window.initApp = function () {
+  var app = createApp(App);
   app.use(ElementPlus);
   app.component('page-user-student', UserPages.PageUserStudent);
   app.component('page-user-student-batch', UserPages.PageUserStudentBatch);
@@ -410,4 +411,4 @@ window.addEventListener('DOMContentLoaded', () => {
   app.component('page-library-book', LibraryPages.PageLibraryBook);
   app.component('page-library-borrow', LibraryPages.PageLibraryBorrow);
   app.mount('#app');
-});
+};

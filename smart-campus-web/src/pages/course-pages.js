@@ -92,9 +92,9 @@
     },
     created() { this.load(); },
     methods: {
-      load() {
-        this.list = CourseService.getCourses();
-        this.teachers = UserService.getTeachers();
+      async load() {
+        this.list = await CourseService.getCourses();
+        this.teachers = await UserService.getTeachers();
       },
       openAdd() {
         this.dialog.mode = 'add';
@@ -109,20 +109,21 @@
         if (t) this.form.teacherId = t.id;
         this.dialog.show = true;
       },
-      submit() {
+      async submit() {
         if (!this.form.id || !this.form.name) { Common.showMsg('编号和名称必填', 'warning'); return; }
-        // 根据 teacher 名称反查 teacherId
         const t = this.teachers.find(x => x.name === this.form.teacher);
         if (t) this.form.teacherId = t.id;
-        if (this.dialog.mode === 'add') CourseService.addCourse(this.form);
-        else CourseService.updateCourse(this.form);
-        this.load();
+        if (this.dialog.mode === 'add') await CourseService.addCourse(this.form);
+        else await CourseService.updateCourse(this.form);
+        await this.load();
         this.dialog.show = false;
       },
-      confirmDelete(row) {
-        ElementPlus.ElMessageBox.confirm('确定删除课程【' + row.name + '】？相关排课也会被清空', '删除确认', { type: 'warning' })
-          .then(() => { CourseService.deleteCourse(row.id); this.load(); })
-          .catch(() => {});
+      async confirmDelete(row) {
+        try {
+          await ElementPlus.ElMessageBox.confirm('确定删除【' + row.name + '】？', '删除确认', { type: 'warning' });
+          await CourseService.deleteCourse(row.id);
+          await this.load();
+        } catch {}
       }
     }
   };
@@ -221,23 +222,26 @@
     },
     created() { this.load(); },
     methods: {
-      load() { this.list = CourseService.getRooms(); },
+      async load() { this.list = await CourseService.getRooms(); },
       openAdd() {
         this.dialog.mode = 'add';
         this.form = { id: '', name: '', building: '', floor: 1, capacity: 60, type: '多媒体教室', equipment: '', status: '可用' };
         this.dialog.show = true;
       },
       openEdit(row) { this.dialog.mode = 'edit'; this.form = Object.assign({}, row); this.dialog.show = true; },
-      submit() {
+      async submit() {
         if (!this.form.id || !this.form.name) { Common.showMsg('编号和名称必填', 'warning'); return; }
-        if (this.dialog.mode === 'add') CourseService.addRoom(this.form);
-        else CourseService.updateRoom(this.form);
-        this.load();
+        if (this.dialog.mode === 'add') await CourseService.addRoom(this.form);
+        else await CourseService.updateRoom(this.form);
+        await this.load();
         this.dialog.show = false;
       },
-      confirmDelete(row) {
-        ElementPlus.ElMessageBox.confirm('确定删除教室【' + row.name + '】？', '删除确认', { type: 'warning' })
-          .then(() => { CourseService.deleteRoom(row.id); this.load(); }).catch(() => {});
+      async confirmDelete(row) {
+        try {
+          await ElementPlus.ElMessageBox.confirm('确定删除【' + row.name + '】？', '删除确认', { type: 'warning' });
+          await CourseService.deleteRoom(row.id);
+          await this.load();
+        } catch {}
       }
     }
   };
@@ -345,19 +349,22 @@
     },
     created() { this.load(); },
     methods: {
-      load() { this.list = CourseService.getLabs(); },
+      async load() { this.list = await CourseService.getLabs(); },
       openAdd() { this.dialog.mode = 'add'; this.form = { id: '', name: '', building: '', floor: 1, capacity: 40, type: '计算机实验室', pcCount: 40, manager: '', phone: '', equipment: '', status: '可用' }; this.dialog.show = true; },
       openEdit(row) { this.dialog.mode = 'edit'; this.form = Object.assign({}, row); this.dialog.show = true; },
-      submit() {
+      async submit() {
         if (!this.form.id || !this.form.name) { Common.showMsg('编号和名称必填', 'warning'); return; }
-        if (this.dialog.mode === 'add') CourseService.addLab(this.form);
-        else CourseService.updateLab(this.form);
-        this.load();
+        if (this.dialog.mode === 'add') await CourseService.addLab(this.form);
+        else await CourseService.updateLab(this.form);
+        await this.load();
         this.dialog.show = false;
       },
-      confirmDelete(row) {
-        ElementPlus.ElMessageBox.confirm('确定删除实验室【' + row.name + '】？', '删除确认', { type: 'warning' })
-          .then(() => { CourseService.deleteLab(row.id); this.load(); }).catch(() => {});
+      async confirmDelete(row) {
+        try {
+          await ElementPlus.ElMessageBox.confirm('确定删除【' + row.name + '】？', '删除确认', { type: 'warning' });
+          await CourseService.deleteLab(row.id);
+          await this.load();
+        } catch {}
       }
     }
   };
@@ -474,11 +481,11 @@
       colorHex(c) {
         return { blue: '#409eff', green: '#67c23a', orange: '#e6a23c', purple: '#8b5cf6', pink: '#ec4899' }[c] || '#409eff';
       },
-      load() {
-        this.list = CourseService.getSchedule();
-        this.courses = CourseService.getCourses();
-        this.rooms = CourseService.getRooms();
-        this.labs = CourseService.getLabs();
+      async load() {
+        this.list = await CourseService.getSchedule();
+        this.courses = await CourseService.getCourses();
+        this.rooms = await CourseService.getRooms();
+        this.labs = await CourseService.getLabs();
       },
       onCourseChange(id) {
         const course = this.courses.find(c => c.id === id);
@@ -494,24 +501,29 @@
         this.form = Object.assign({}, row);
         this.dialog.show = true;
       },
-      submit() {
+      async submit() {
         if (!this.form.courseId || !this.form.roomId) { Common.showMsg('请选择课程和地点', 'warning'); return; }
-        // 根据 roomId 反查 roomName
         const place = [...this.rooms, ...this.labs].find(p => p.id === this.form.roomId);
         if (place) this.form.roomName = place.name;
-        if (this.dialog.mode === 'add') CourseService.addScheduleItem(this.form);
-        else CourseService.updateScheduleItem(this.form);
-        this.load();
+        if (this.dialog.mode === 'add') await CourseService.addScheduleItem(this.form);
+        else await CourseService.updateScheduleItem(this.form);
+        await this.load();
         this.dialog.show = false;
       },
-      confirmDelete(row) {
-        ElementPlus.ElMessageBox.confirm('确定取消该教学任务【' + row.courseName + ' ' + CourseService.dayNames[row.day-1] + '】？', '确认', { type: 'warning' })
-          .then(() => { CourseService.deleteScheduleItem(row.id); this.load(); }).catch(() => {});
+      async confirmDelete(row) {
+        try {
+          await ElementPlus.ElMessageBox.confirm('确定取消【' + row.courseName + '】？', '确认', { type: 'warning' });
+          await CourseService.deleteScheduleItem(row.id);
+          await this.load();
+        } catch {}
       },
-      autoArrange() { CourseService.autoArrange(); this.load(); },
-      confirmClear() {
-        ElementPlus.ElMessageBox.confirm('将清空所有排课，确认继续？', '确认', { type: 'warning' })
-          .then(() => { CourseService.clearSchedule(); this.load(); }).catch(() => {});
+      async autoArrange() { CourseService.autoArrange(); await this.load(); },
+      async confirmClear() {
+        try {
+          await ElementPlus.ElMessageBox.confirm('将清空所有排课，确认继续？', '确认', { type: 'warning' });
+          CourseService.clearSchedule();
+          await this.load();
+        } catch {}
       }
     }
   };
@@ -594,7 +606,7 @@
     },
     created() { this.load(); },
     methods: {
-      load() { this.list = CourseService.getSchedule(); },
+      async load() { this.list = await CourseService.getSchedule(); },
       itemsAt(day, period) { return this.list.filter(s => s.day === day && s.period === period); },
       colorHex(c) { return { blue: '#409eff', green: '#67c23a', orange: '#e6a23c', purple: '#8b5cf6', pink: '#ec4899' }[c] || '#409eff'; },
       colorBg(c) {

@@ -124,9 +124,9 @@
     },
     created() { this.load(); },
     methods: {
-      load() {
-        this.books = LibraryService.getBooks();
-        this.borrows = LibraryService.getBorrows();
+      async load() {
+        this.books = await LibraryService.getBooks();
+        this.borrows = await LibraryService.getBorrows();
       },
       openAdd() {
         this.dialog.mode = 'add';
@@ -134,30 +134,25 @@
         this.dialog.show = true;
       },
       openEdit(row) { this.dialog.mode = 'edit'; this.form = Object.assign({}, row); this.dialog.show = true; },
-      submit() {
+      async submit() {
         if (!this.form.id || !this.form.title) { Common.showMsg('编号和书名必填', 'warning'); return; }
-        if (this.dialog.mode === 'add') LibraryService.addBook(this.form);
-        else LibraryService.updateBook(this.form);
-        this.load(); this.dialog.show = false;
+        if (this.dialog.mode === 'add') await LibraryService.addBook(this.form);
+        else await LibraryService.updateBook(this.form);
+        await this.load(); this.dialog.show = false;
       },
-      confirmDelete(row) {
-        ElementPlus.ElMessageBox.confirm('确定删除《' + row.title + '》？', '删除确认', { type: 'warning' })
-          .then(() => { LibraryService.deleteBook(row.id); this.load(); }).catch(() => {});
+      async confirmDelete(row) {
+        try { await ElementPlus.ElMessageBox.confirm('确定删除《' + row.title + '》？', '删除确认', { type: 'warning' }); await LibraryService.deleteBook(row.id); await this.load(); } catch {}
       },
-      quickBorrow(book) {
-        const students = UserService.getStudents();
-        const student = students[0] || {};
-        // 弹出选择学生的小表单
-        ElementPlus.ElMessageBox.prompt(
-          '请输入借阅学生姓名（默认：' + student.name + '）',
-          '办理借阅《' + book.title + '》',
-          { confirmButtonText: '确认借阅', cancelButtonText: '取消', inputValue: student.name }
-        ).then(({ value }) => {
-          const s = students.find(x => x.name === value) || students[0];
+      async quickBorrow(book) {
+        var students = await UserService.getStudents();
+        var student = students[0] || {};
+        try {
+          var v = await ElementPlus.ElMessageBox.prompt('请输入借阅学生姓名（默认：' + student.name + '）','办理借阅《' + book.title + '》',{ confirmButtonText:'确认借阅', cancelButtonText:'取消', inputValue:student.name });
+          var s = students.find(function(x){return x.name===v.value;}) || students[0];
           if (!s) { Common.showMsg('未找到学生', 'error'); return; }
-          LibraryService.borrowBook({ studentId: s.id, studentName: s.name, bookId: book.id, bookTitle: book.title });
-          this.load();
-        }).catch(() => {});
+          await LibraryService.borrowBook({ studentId:s.id, studentName:s.name, bookId:book.id });
+          await this.load();
+        } catch {}
       }
     }
   };
@@ -276,10 +271,10 @@
     },
     created() { this.load(); },
     methods: {
-      load() {
-        this.borrows = LibraryService.getBorrows();
-        this.books = LibraryService.getBooks();
-        this.students = UserService.getStudents();
+      async load() {
+        this.borrows = await LibraryService.getBorrows();
+        this.books = await LibraryService.getBooks();
+        this.students = await UserService.getStudents();
       },
       openBorrow() {
         this.form = { studentId: '', studentName: '', bookId: '', bookTitle: '', borrowDate: Common.today(), remark: '' };
@@ -287,14 +282,13 @@
       },
       onStudentChange(id) { const s = this.students.find(x => x.id === id); if (s) this.form.studentName = s.name; },
       onBookChange(id) { const b = this.books.find(x => x.id === id); if (b) this.form.bookTitle = b.title; },
-      submitBorrow() {
+      async submitBorrow() {
         if (!this.form.studentId || !this.form.bookId) { Common.showMsg('请选择学生和书籍', 'warning'); return; }
-        LibraryService.borrowBook(this.form);
-        this.load(); this.dialog.show = false;
+        await LibraryService.borrowBook(this.form);
+        await this.load(); this.dialog.show = false;
       },
-      returnBook(row) {
-        ElementPlus.ElMessageBox.confirm('确定：' + row.studentName + ' 归还《' + row.bookTitle + '》？', '确认归还', { type: 'info' })
-          .then(() => { LibraryService.returnBook(row.id); this.load(); }).catch(() => {});
+      async returnBook(row) {
+        try { await ElementPlus.ElMessageBox.confirm('确定：' + row.studentName + ' 归还《' + row.bookTitle + '》？', '确认归还', { type: 'info' }); await LibraryService.returnBook(row.id); await this.load(); } catch {}
       },
       renewBook(row) { LibraryService.renewBook(row.id); this.load(); },
       confirmDelete(row) {

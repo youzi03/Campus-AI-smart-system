@@ -22,6 +22,7 @@ public class AuthInterceptor implements HandlerInterceptor {
     /** 无需认证的路径前缀 */
     private static final String[] PUBLIC_PATHS = {
         "/api/auth/login",
+        "/api/auth/register",
         "/api/health"
     };
 
