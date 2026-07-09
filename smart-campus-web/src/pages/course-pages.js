@@ -427,7 +427,11 @@
                   <el-option v-for="p in periodNames" :key="p.p" :label="p.name + ' ' + p.time" :value="p.p" />
                 </el-select>
               </el-form-item></el-col>
-              <el-col :span="8"><el-form-item label="周次"><el-input v-model="form.week" placeholder="如 1-16周" /></el-form-item></el-col>
+              <el-col :span="8"><el-form-item label="周次">
+                <el-select v-model="form.week" style="width:100%" filterable allow-create>
+                  <el-option v-for="w in weekOptions" :key="w" :label="w" :value="w" />
+                </el-select>
+              </el-form-item></el-col>
               <el-col :span="16"><el-form-item label="教室/实验室">
                 <el-select v-model="form.roomId" style="width:100%" filterable>
                   <el-option-group label="普通教室">
@@ -463,6 +467,7 @@
         colorPalette: CourseService.colorPalette,
         filter: { keyword: '', day: '' },
         dialog: { show: false, mode: 'add' },
+        weekOptions: ['1-8周','1-9周','1-10周','1-11周','1-12周','1-13周','1-14周','1-15周','1-16周','1-17周','1-18周','2-17周','3-18周','9-16周'],
         form: { id: '', courseId: '', courseName: '', teacherId: '', teacherName: '', day: 1, period: 1, roomId: '', roomName: '', classGroup: '', week: '1-16周', color: 'blue' }
       };
     },
