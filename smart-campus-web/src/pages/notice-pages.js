@@ -14,7 +14,6 @@
             <div class="page-desc">查看、编辑、置顶和删除所有系统公告</div>
           </div>
           <div style="display:flex;gap:10px">
-            <el-button type="primary" @click="openAdd">+ 发布新公告</el-button>
           </div>
         </div>
         <div class="panel">
@@ -76,7 +75,7 @@
           </template>
         </el-dialog>
 
-        <el-dialog v-model="dialog.show" :title="dialog.mode==='add'?'发布新公告':'编辑公告'" width="620px">
+        <el-dialog v-model="dialog.show" title="编辑公告" width="620px">
           <el-form label-width="100px">
             <el-form-item label="类型">
               <el-radio-group v-model="form.type">
@@ -109,7 +108,7 @@
         list: [],
         filter: { keyword: '', type: '' },
         page: { current: 1, size: 10 },
-        dialog: { show: false, mode: 'add' },
+        dialog: { show: false },
         form: { id: '', title: '', type: '通知', target: '全体师生', publisher: '教务处', content: '', pinned: false },
         detail: { show: false, title: '', type: '', target: '', publisher: '', createAt: '', views: 0, content: '', pinned: false }
       };
@@ -137,16 +136,10 @@
         localStorage.setItem('notices', JSON.stringify(this.list));
         this.detail = Object.assign({ show: true }, row);
       },
-      openAdd() {
-        this.dialog.mode = 'add';
-        this.form = { id: 'N' + Date.now(), title: '', type: '通知', target: '全体师生', publisher: '教务处', content: '', pinned: false };
-        this.dialog.show = true;
-      },
-      openEdit(row) { this.dialog.mode = 'edit'; this.form = Object.assign({}, row); this.dialog.show = true; },
+      openEdit(row) { this.form = Object.assign({}, row); this.dialog.show = true; },
       async submit() {
         if (!this.form.title || !this.form.content) { Common.showMsg('标题和内容不能为空', 'warning'); return; }
-        if (this.dialog.mode === 'add') await NoticeService.addNotice(this.form);
-        else await NoticeService.updateNotice(this.form);
+        await NoticeService.updateNotice(this.form);
         await this.load();
         this.dialog.show = false;
       },
