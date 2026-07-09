@@ -105,6 +105,7 @@ public class UserService {
         if (s.getGrade() != null) existing.setGrade(s.getGrade());
         if (s.getPhone() != null) existing.setPhone(s.getPhone());
         if (s.getDorm() != null) existing.setDorm(s.getDorm());
+        if (s.getClassName() != null) existing.setClassName(s.getClassName());
         if (s.getStatus() != null) existing.setStatus(s.getStatus());
         Student saved = studentRepository.save(existing);
         addOpLog("编辑", "学生", id, "编辑学生：" + saved.getName());

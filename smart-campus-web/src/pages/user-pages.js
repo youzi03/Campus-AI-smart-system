@@ -58,6 +58,7 @@
             <el-table-column prop="college" label="学院" width="140" />
             <el-table-column prop="major" label="专业" width="150" />
             <el-table-column prop="grade" label="年级" width="90" align="center" />
+            <el-table-column prop="className" label="班级" width="150" />
             <el-table-column prop="phone" label="联系电话" width="140" />
             <el-table-column prop="status" label="学籍状态" width="100" align="center">
               <template #default="s">

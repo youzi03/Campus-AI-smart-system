@@ -40,6 +40,10 @@ public class Student {
     @Column(length = 10)
     private String grade;
 
+    /** 班级（同专业同年级的学生归为同一班级） */
+    @Column(length = 50)
+    private String className;
+
     @Column(length = 20)
     private String phone;
 
