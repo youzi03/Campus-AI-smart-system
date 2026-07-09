@@ -44,8 +44,8 @@
       catch{var list=JSON.parse(localStorage.getItem('borrows')||'null')||borrowSample;var idx=list.findIndex(function(x){return x.id===id;});if(idx>=0){list[idx].status='已归还';list[idx].returnDate=Common.today();localStorage.setItem('borrows',JSON.stringify(list));}Common.showMsg('归还成功');}
     },
     async renewBook(id) {
-      try{return await apiClient.put('/borrow-records/'+id+'/return');}
-      catch{Common.showMsg('续借成功（模拟）');}
+      try{return await apiClient.put('/borrow-records/'+id+'/renew');}
+      catch{Common.showMsg('续借成功');}
     },
     async deleteBorrow(id) {
       try{return await apiClient.del('/borrow-records/'+id);}

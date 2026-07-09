@@ -65,6 +65,12 @@ public class LibraryService {
         book.setAvailable(book.getAvailable() != null ? book.getAvailable() + 1 : 1);
         bookRepository.save(book);
     }
+    @Transactional public void renewBook(String recordId) {
+        BorrowRecord r = borrowRecordRepository.findById(recordId).orElseThrow(() -> new ResourceNotFoundException("记录不存在"));
+        if (!"借阅中".equals(r.getStatus())) throw new BusinessException("只有借阅中的记录才能续借");
+        r.setDueDate(java.time.LocalDate.parse(r.getDueDate()).plusDays(30).toString());
+        borrowRecordRepository.save(r);
+    }
     public List<BorrowRecord> getOverdueRecords() {
         return borrowRecordRepository.findByStatus("借阅中").stream()
                 .filter(r -> r.getDueDate() != null && r.getDueDate().compareTo(java.time.LocalDate.now().toString()) < 0)
