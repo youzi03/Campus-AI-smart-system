@@ -174,6 +174,7 @@
     data() {
       return {
         tab: 'building',
+        buildingStats: [],
         rooms: [], allocs: [], students: [],
         filterRoom: { keyword: '', gender: '', status: '' },
         filterAlloc: { keyword: '', status: '' },
@@ -184,7 +185,6 @@
       };
     },
     computed: {
-      buildingStats() { return DormService.getBuildingStats(); },
       filteredRooms() {
         const kw = this.filterRoom.keyword.trim();
         return this.rooms.filter(r => {
@@ -220,6 +220,7 @@
         this.rooms = await DormService.getRooms();
         this.allocs = await DormService.getAllocations();
         this.students = await UserService.getStudents();
+        this.buildingStats = await DormService.getBuildingStats();
       },
       openAddRoom() {
         this.roomDialog.mode = 'add';
