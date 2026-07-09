@@ -84,12 +84,12 @@
                   <el-option v-for="c in categories" :key="c" :label="c" :value="c" />
                 </el-select>
               </el-form-item></el-col>
-              <el-col :span="8"><el-form-item label="出版年份"><el-input-number v-model.number="form.pubYear" :min="1900" :max="2100" style="width:100%" /></el-form-item></el-col>
-              <el-col :span="8"><el-form-item label="单价(元)"><el-input-number v-model.number="form.price" :min="0" :precision="2" style="width:100%" /></el-form-item></el-col>
+              <el-col :span="8"><el-form-item label="出版年份"><el-input-number v-model="form.pubYear" :min="1900" :max="2100" controls-position="right" style="width:100%" /></el-form-item></el-col>
+              <el-col :span="8"><el-form-item label="单价(元)"><el-input-number v-model="form.price" :min="0" :precision="2" controls-position="right" style="width:100%" /></el-form-item></el-col>
             </el-row>
             <el-row :gutter="16">
-              <el-col :span="8"><el-form-item label="总册数"><el-input-number v-model.number="form.total" :min="1" style="width:100%" /></el-form-item></el-col>
-              <el-col :span="8"><el-form-item label="可借册数"><el-input-number v-model.number="form.available" :min="0" style="width:100%" /></el-form-item></el-col>
+              <el-col :span="8"><el-form-item label="总册数"><el-input-number v-model="form.total" :min="1" controls-position="right" style="width:100%" /></el-form-item></el-col>
+              <el-col :span="8"><el-form-item label="可借册数"><el-input-number v-model="form.available" :min="0" controls-position="right" style="width:100%" /></el-form-item></el-col>
               <el-col :span="8"><el-form-item label="馆藏位置"><el-input v-model="form.location" placeholder="如 A区-3架-5层" /></el-form-item></el-col>
             </el-row>
           </el-form>

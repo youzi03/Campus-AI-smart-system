@@ -58,7 +58,7 @@
                 </el-select>
               </el-form-item></el-col>
               <el-col :span="12"><el-form-item label="成绩 (0-100)">
-                <el-input-number v-model.number="form.score" :min="0" :max="100" style="width:100%" />
+                <el-input-number v-model="form.score" :min="0" :max="100" controls-position="right" style="width:100%" />
               </el-form-item></el-col>
               <el-col :span="12"><el-form-item label="学期"><el-input v-model="form.semester" /></el-form-item></el-col>
             </el-row>

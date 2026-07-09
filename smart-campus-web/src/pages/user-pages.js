@@ -405,7 +405,7 @@
               <el-col :span="12"><el-form-item label="专业方向"><el-input v-model="form.major" /></el-form-item></el-col>
               <el-col :span="12"><el-form-item label="电话"><el-input v-model="form.phone" /></el-form-item></el-col>
               <el-col :span="12"><el-form-item label="邮箱"><el-input v-model="form.email" /></el-form-item></el-col>
-              <el-col :span="12"><el-form-item label="入职年份"><el-input-number v-model.number="form.joinYear" :min="1990" :max="2100" style="width:100%" /></el-form-item></el-col>
+              <el-col :span="12"><el-form-item label="入职年份"><el-input-number v-model="form.joinYear" :min="1990" :max="2100" controls-position="right" style="width:100%" /></el-form-item></el-col>
             </el-row>
           </el-form>
           <template #footer>

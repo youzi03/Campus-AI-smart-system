@@ -122,18 +122,18 @@
             <el-row :gutter="16">
               <el-col :span="12"><el-form-item label="宿舍编号"><el-input v-model="roomForm.id" :disabled="roomDialog.mode==='edit'" /></el-form-item></el-col>
               <el-col :span="12"><el-form-item label="楼栋"><el-input v-model="roomForm.building" placeholder="如 A栋" /></el-form-item></el-col>
-              <el-col :span="8"><el-form-item label="楼层"><el-input-number v-model.number="roomForm.floor" :min="1" style="width:100%" /></el-form-item></el-col>
+              <el-col :span="8"><el-form-item label="楼层"><el-input-number v-model="roomForm.floor" :min="1" controls-position="right" style="width:100%" /></el-form-item></el-col>
               <el-col :span="8"><el-form-item label="房间号"><el-input v-model="roomForm.roomNo" /></el-form-item></el-col>
               <el-col :span="8"><el-form-item label="宿舍类型">
                 <el-select v-model="roomForm.type" style="width:100%">
                   <el-option label="4人间" value="4人间" /><el-option label="6人间" value="6人间" /><el-option label="8人间" value="8人间" />
                 </el-select>
               </el-form-item></el-col>
-              <el-col :span="8"><el-form-item label="容量"><el-input-number v-model.number="roomForm.capacity" :min="1" style="width:100%" /></el-form-item></el-col>
+              <el-col :span="8"><el-form-item label="容量"><el-input-number v-model="roomForm.capacity" :min="1" :max="500" controls-position="right" style="width:100%" /></el-form-item></el-col>
               <el-col :span="8"><el-form-item label="性别">
                 <el-radio-group v-model="roomForm.gender"><el-radio label="男">男</el-radio><el-radio label="女">女</el-radio></el-radio-group>
               </el-form-item></el-col>
-              <el-col :span="8"><el-form-item label="住宿费"><el-input-number v-model.number="roomForm.fee" :min="0" style="width:100%" /></el-form-item></el-col>
+              <el-col :span="8"><el-form-item label="住宿费"><el-input-number v-model="roomForm.fee" :min="0" controls-position="right" style="width:100%" /></el-form-item></el-col>
               <el-col :span="12"><el-form-item label="状态">
                 <el-select v-model="roomForm.status" style="width:100%">
                   <el-option label="使用中" value="使用中" /><el-option label="空闲" value="空闲" /><el-option label="维修中" value="维修中" />
