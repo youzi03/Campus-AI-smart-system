@@ -71,6 +71,10 @@ public class LibraryService {
         r.setDueDate(java.time.LocalDate.parse(r.getDueDate()).plusDays(30).toString());
         borrowRecordRepository.save(r);
     }
+    @Transactional public void deleteBorrowRecord(String id) {
+        borrowRecordRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("借阅记录不存在"));
+        borrowRecordRepository.deleteById(id);
+    }
     public List<BorrowRecord> getOverdueRecords() {
         return borrowRecordRepository.findByStatus("借阅中").stream()
                 .filter(r -> r.getDueDate() != null && r.getDueDate().compareTo(java.time.LocalDate.now().toString()) < 0)

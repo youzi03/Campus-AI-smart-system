@@ -32,6 +32,8 @@ public class LibraryController {
     public ApiResult<Void> returnBook(@PathVariable String id) { libraryService.returnBook(id); return ApiResult.success(); }
     @PutMapping("/borrow-records/{id}/renew")
     public ApiResult<Void> renewBook(@PathVariable String id) { libraryService.renewBook(id); return ApiResult.success(); }
+    @DeleteMapping("/borrow-records/{id}")
+    public ApiResult<Void> deleteBorrow(@PathVariable String id) { libraryService.deleteBorrowRecord(id); return ApiResult.success(); }
     @GetMapping("/borrow-records/overdue")
     public ApiResult<List<BorrowRecord>> overdue() { return ApiResult.success(libraryService.getOverdueRecords()); }
 }
