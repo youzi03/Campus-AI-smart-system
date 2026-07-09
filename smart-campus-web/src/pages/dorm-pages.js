@@ -228,15 +228,18 @@
         this.roomDialog.show = true;
       },
       openEditRoom(row) { this.roomDialog.mode = 'edit'; this.roomForm = Object.assign({}, row); this.roomDialog.show = true; },
-      submitRoom() {
+      async submitRoom() {
         if (!this.roomForm.id || !this.roomForm.building) { Common.showMsg('编号和楼栋必填', 'warning'); return; }
-        if (this.roomDialog.mode === 'add') DormService.addRoom(this.roomForm);
-        else DormService.updateRoom(this.roomForm);
-        this.load(); this.roomDialog.show = false;
+        if (this.roomDialog.mode === 'add') await DormService.addRoom(this.roomForm);
+        else await DormService.updateRoom(this.roomForm);
+        await this.load(); this.roomDialog.show = false;
       },
-      confirmDeleteRoom(row) {
-        ElementPlus.ElMessageBox.confirm('确定删除宿舍【' + row.id + '】？若有入住记录将无法删除', '删除确认', { type: 'warning' })
-          .then(() => { DormService.deleteRoom(row.id); this.load(); }).catch(() => {});
+      async confirmDeleteRoom(row) {
+        try {
+          await ElementPlus.ElMessageBox.confirm('确定删除宿舍【' + row.id + '】？若有入住记录将无法删除', '删除确认', { type: 'warning' });
+          await DormService.deleteRoom(row.id);
+          await this.load();
+        } catch {}
       },
       openAllocate() {
         this.allocForm = { studentId: '', studentName: '', roomId: '', checkIn: Common.today() };
