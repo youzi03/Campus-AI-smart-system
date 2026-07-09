@@ -38,12 +38,12 @@
       }
     },
     async deleteNotice(id) {
-      if (!id) { Common.showMsg('公告 ID 无效', 'error'); return; }
+      if (id === null || id === undefined) { Common.showMsg('公告 ID 无效', 'error'); return; }
       try { return await apiClient.del('/notices/'+id); }
       catch{var list=(JSON.parse(localStorage.getItem('notices')||'null')||noticeSample).filter(function(x){return x.id!==id;});localStorage.setItem('notices',JSON.stringify(list));Common.showMsg('删除成功');}
     },
     async togglePin(id) {
-      if (!id) { Common.showMsg('公告 ID 无效', 'error'); return; }
+      if (id === null || id === undefined) { Common.showMsg('公告 ID 无效', 'error'); return; }
       try { return await apiClient.put('/notices/'+id+'/pin'); }
       catch {
         var list=JSON.parse(localStorage.getItem('notices')||'null')||noticeSample;

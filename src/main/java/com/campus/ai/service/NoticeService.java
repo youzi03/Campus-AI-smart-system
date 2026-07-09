@@ -57,16 +57,16 @@ public class NoticeService {
     }
     @Transactional
     public void deleteNotice(String id) {
-        if (id == null || id.isBlank()) {
-            throw new BusinessException("公告 ID 不能为空");
+        if (id == null) {
+            throw new BusinessException("公告 ID 不能为 null");
         }
         getNotice(id);
         noticeRepository.deleteById(id);
     }
     @Transactional
     public Notice togglePin(String id) {
-        if (id == null || id.isBlank()) {
-            throw new BusinessException("公告 ID 不能为空");
+        if (id == null) {
+            throw new BusinessException("公告 ID 不能为 null");
         }
         Notice n = getNotice(id);
         n.setPinned(!Boolean.TRUE.equals(n.getPinned()));
@@ -76,8 +76,8 @@ public class NoticeService {
     /** 推送公告（标记已推送） */
     @Transactional
     public void pushNotice(String id) {
-        if (id == null || id.isBlank()) {
-            throw new BusinessException("公告 ID 不能为空");
+        if (id == null) {
+            throw new BusinessException("公告 ID 不能为 null");
         }
         Notice n = getNotice(id);
         if (n.getViews() == null) n.setViews(0);
