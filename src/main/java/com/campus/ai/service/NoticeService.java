@@ -1,5 +1,6 @@
 package com.campus.ai.service;
 
+import com.campus.ai.common.BusinessException;
 import com.campus.ai.common.ResourceNotFoundException;
 import com.campus.ai.entity.Notice;
 import com.campus.ai.repository.NoticeRepository;
@@ -35,6 +36,10 @@ public class NoticeService {
     public Notice addNotice(Notice n) {
         n.setViews(0);
         if (n.getPinned() == null) n.setPinned(false);
+        // 自动生成 ID（兼容前端未传 ID 的情况）
+        if (n.getId() == null || n.getId().isBlank()) {
+            n.setId("N" + System.currentTimeMillis());
+        }
         return noticeRepository.save(n);
     }
     @Transactional
@@ -51,9 +56,18 @@ public class NoticeService {
         return noticeRepository.save(exist);
     }
     @Transactional
-    public void deleteNotice(String id) { getNotice(id); noticeRepository.deleteById(id); }
+    public void deleteNotice(String id) {
+        if (id == null || id.isBlank()) {
+            throw new BusinessException("公告 ID 不能为空");
+        }
+        getNotice(id);
+        noticeRepository.deleteById(id);
+    }
     @Transactional
     public Notice togglePin(String id) {
+        if (id == null || id.isBlank()) {
+            throw new BusinessException("公告 ID 不能为空");
+        }
         Notice n = getNotice(id);
         n.setPinned(!Boolean.TRUE.equals(n.getPinned()));
         return noticeRepository.save(n);
@@ -62,6 +76,9 @@ public class NoticeService {
     /** 推送公告（标记已推送） */
     @Transactional
     public void pushNotice(String id) {
+        if (id == null || id.isBlank()) {
+            throw new BusinessException("公告 ID 不能为空");
+        }
         Notice n = getNotice(id);
         if (n.getViews() == null) n.setViews(0);
         n.setViews(n.getViews() + 1);
