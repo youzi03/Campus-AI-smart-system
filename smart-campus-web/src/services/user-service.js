@@ -272,7 +272,8 @@
 
     async getOpLogs(opts) {
       try {
-        return await apiClient.get('/op-logs', opts || {});
+        var data = await apiClient.get('/op-logs', opts || {});
+        return data && data.list ? data.list : data;
       } catch {
         _online = false;
         const logs = fallbackGetOpLogs();
