@@ -4,7 +4,11 @@
  * ============================================================ */
 (function (global) {
 
-  const API_BASE = 'http://localhost:8080/api';
+  // 自动检测运行环境：
+  // - 通过 Vite 开发服务器 (localhost:3000) 时使用相对路径，由 Vite 代理转发
+  // - 直接打开文件时使用绝对路径直连后端
+  const isViteDev = window.location.hostname === 'localhost' && window.location.port === '3000';
+  const API_BASE = isViteDev ? '/api' : 'http://localhost:8080/api';
 
   /**
    * 获取 Authorization 请求头
