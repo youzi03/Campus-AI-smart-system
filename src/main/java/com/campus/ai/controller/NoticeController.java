@@ -37,6 +37,9 @@ public class NoticeController {
     public ApiResult<Void> deleteNotice(@PathVariable String id) { noticeService.deleteNotice(id); return ApiResult.success(); }
     @PutMapping("/notices/{id}/pin")
     public ApiResult<Notice> togglePin(@PathVariable String id) { return ApiResult.success(noticeService.togglePin(id)); }
+    /** 推送公告 */
+    @PostMapping("/notices/{id}/push")
+    public ApiResult<Void> pushNotice(@PathVariable String id) { noticeService.pushNotice(id); return ApiResult.success(); }
     @GetMapping("/notices/count")
     public ApiResult<Long> count() { return ApiResult.success(noticeService.noticeCount()); }
 }

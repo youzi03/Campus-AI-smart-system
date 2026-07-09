@@ -58,6 +58,16 @@ public class NoticeService {
         n.setPinned(!Boolean.TRUE.equals(n.getPinned()));
         return noticeRepository.save(n);
     }
+
+    /** 推送公告（标记已推送） */
+    @Transactional
+    public void pushNotice(String id) {
+        Notice n = getNotice(id);
+        if (n.getViews() == null) n.setViews(0);
+        n.setViews(n.getViews() + 1);
+        noticeRepository.save(n);
+        log.info("公告已推送: {}", id);
+    }
     public long noticeCount() { return noticeRepository.count(); }
 
     private String blankToNull(String s) { return (s == null || s.trim().isEmpty()) ? null : s.trim(); }

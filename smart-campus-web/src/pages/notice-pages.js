@@ -139,7 +139,7 @@
       },
       openAdd() {
         this.dialog.mode = 'add';
-        this.form = { id: '', title: '', type: '通知', target: '全体师生', publisher: '教务处', content: '', pinned: false };
+        this.form = { id: 'N' + Date.now(), title: '', type: '通知', target: '全体师生', publisher: '教务处', content: '', pinned: false };
         this.dialog.show = true;
       },
       openEdit(row) { this.dialog.mode = 'edit'; this.form = Object.assign({}, row); this.dialog.show = true; },
@@ -223,7 +223,7 @@
     `,
     data() {
       return {
-        form: { id: '', title: '', type: '通知', target: '全体师生', publisher: '教务处', content: '', pinned: false, createAt: Common.today() },
+        form: { id: 'N' + Date.now(), title: '', type: '通知', target: '全体师生', publisher: '教务处', content: '', pinned: false, createAt: Common.today() },
         preview: { show: false }
       };
     },
@@ -237,7 +237,7 @@
       },
       preview() { this.preview.show = true; },
       reset() {
-        this.form = { id: '', title: '', type: '通知', target: '全体师生', publisher: '教务处', content: '', pinned: false, createAt: Common.today() };
+        this.form = { id: 'N' + Date.now(), title: '', type: '通知', target: '全体师生', publisher: '教务处', content: '', pinned: false, createAt: Common.today() };
       }
     }
   };
