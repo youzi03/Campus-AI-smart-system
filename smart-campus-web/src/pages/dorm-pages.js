@@ -223,7 +223,7 @@
       },
       openAddRoom() {
         this.roomDialog.mode = 'add';
-        this.roomForm = { id: '', building: '', floor: 1, roomNo: '', type: '4人间', capacity: 4, gender: '男', fee: 1200, status: '使用中' };
+        this.roomForm = { id: 'D-' + Date.now().toString(36).toUpperCase(), building: '', floor: 1, roomNo: '', type: '4人间', capacity: 4, gender: '男', fee: 1200, status: '使用中' };
         this.roomDialog.show = true;
       },
       openEditRoom(row) { this.roomDialog.mode = 'edit'; this.roomForm = Object.assign({}, row); this.roomDialog.show = true; },

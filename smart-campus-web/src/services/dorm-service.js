@@ -31,6 +31,7 @@
   var DormService = {
     async getRooms() { try { return await apiClient.get('/dorm-rooms'); } catch { return JSON.parse(localStorage.getItem('dormRooms')||'null')||roomSample; } },
     async addRoom(r) {
+      if (!r.id) r.id = 'D-' + Date.now().toString(36).toUpperCase();
       try{return await apiClient.post('/dorm-rooms',r);}
       catch{var list=JSON.parse(localStorage.getItem('dormRooms')||'null')||roomSample;if(list.some(function(x){return x.id===r.id;})){Common.showMsg('编号已存在','error');return false;}list.unshift(r);localStorage.setItem('dormRooms',JSON.stringify(list));Common.showMsg('添加成功');return true;}
     },
@@ -68,6 +69,13 @@
         b.usage = b.capacity > 0 ? (b.occupied / b.capacity * 100).toFixed(1) + '%' : '0%';
         return b;
       });
+    },
+    /** 获取指定宿舍已入住人数 */
+    getRoomOccupancy(roomId) {
+      try {
+        var allocs = JSON.parse(localStorage.getItem('dormAllocs')||'null')||allocSample;
+        return allocs.filter(function(a){return a.roomId===roomId && a.status==='在住';}).length;
+      } catch(e) { return 0; }
     }
   };
   global.DormService = DormService;
