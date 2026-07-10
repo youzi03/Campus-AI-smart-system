@@ -208,11 +208,8 @@
     methods: {
       renderMarkdown,
       async loadSnapshot() {
-        try {
-          this.dataSnapshot = await AIService.getDataSnapshot();
-        } catch (e) {
-          console.warn('加载数据快照失败', e);
-        }
+        try { this.snapshot = await AIService.getSnapshot(); }
+        catch(e) { console.warn('加载数据快照失败', e); }
       },
       async startAnalysis(cap) {
         this.currentCap = cap;

@@ -234,10 +234,6 @@
     },
     created() { this.load(); },
     methods: {
-      async load() {
-        this.list = await ScoreService.getScores();
-        this.courses = await CourseService.getCourses();
-      },
       scoreLevel(s) {
         if (s >= 90) return '优秀';
         if (s >= 80) return '良好';
@@ -282,27 +278,27 @@
               <div style="font-size:13px;color:#606266;margin-bottom:6px">总记录数</div>
               <div style="font-size:28px;font-weight:700;color:#303133">{{ list.length }}</div>
             </div>
-          </el-col>
-          <el-col :span="6">
-            <div style="background:linear-gradient(135deg,#e6f9f7,#d9f2e6);padding:20px;border-radius:12px">
+            <div style="background:linear-gradient(135deg,#e8f1fb,#dbe9fb);padding:20px;border-radius:12px">
+              <div style="font-size:13px;color:#606266;margin-bottom:6px">总记录数</div>
+              <div style="font-size:28px;font-weight:700;color:#303133">{{ list.length }}</div>
               <div style="font-size:13px;color:#606266;margin-bottom:6px">全校平均分</div>
               <div style="font-size:28px;font-weight:700;color:#303133">{{ avgScore }}</div>
             </div>
-          </el-col>
-          <el-col :span="6">
-            <div style="background:linear-gradient(135deg,#fef0e6,#fde8cd);padding:20px;border-radius:12px">
+            <div style="background:linear-gradient(135deg,#e6f9f7,#d9f2e6);padding:20px;border-radius:12px">
+              <div style="font-size:13px;color:#606266;margin-bottom:6px">全校平均分</div>
+              <div style="font-size:28px;font-weight:700;color:#303133">{{ avgScore }}</div>
               <div style="font-size:13px;color:#606266;margin-bottom:6px">及格率</div>
               <div style="font-size:28px;font-weight:700;color:#303133">{{ passRate }}%</div>
             </div>
-          </el-col>
-          <el-col :span="6">
-            <div style="background:linear-gradient(135deg,#f5f0ff,#e8dbf5);padding:20px;border-radius:12px">
+            <div style="background:linear-gradient(135deg,#fef0e6,#fde8cd);padding:20px;border-radius:12px">
+              <div style="font-size:13px;color:#606266;margin-bottom:6px">及格率</div>
+              <div style="font-size:28px;font-weight:700;color:#303133">{{ passRate }}%</div>
               <div style="font-size:13px;color:#606266;margin-bottom:6px">不及格人数</div>
               <div style="font-size:28px;font-weight:700;color:#303133">{{ failCount }}</div>
             </div>
-          </el-col>
-        </el-row>
-
+            <div style="background:linear-gradient(135deg,#f5f0ff,#e8dbf5);padding:20px;border-radius:12px">
+              <div style="font-size:13px;color:#606266;margin-bottom:6px">不及格人数</div>
+              <div style="font-size:28px;font-weight:700;color:#303133">{{ failCount }}</div>
         <el-divider content-position="left">📊 各课程成绩分布</el-divider>
         <div class="panel">
           <el-table :data="courseStats" border stripe style="width:100%">
@@ -329,19 +325,19 @@
             <div v-for="(b, idx) in scoreBars" :key="idx"
                  style="flex:1;display:flex;flex-direction:column;align-items:center;gap:8px">
               <div style="font-weight:700;color:#303133;font-size:18px">{{ b.value }}</div>
-              <div :style="{
+          <div style="height:260px;display:flex;align-items:flex-end;gap:16px;padding:20px 40px">
                 width: '100%', minHeight: '10px',
                 height: Math.max((b.value/(maxBarVal||1)) * 180, 10) + 'px',
-                background: 'linear-gradient(135deg, ' + b.color + ', ' + b.color + '88)',
+              <div style="font-weight:700;color:#303133;font-size:18px">{{ b.value }}</div>
                 borderRadius: '8px 8px 0 0',
                 transition: 'height 0.3s'
               }"></div>
-              <div style="font-size:13px;color:#606266;font-weight:600">{{ b.label }}</div>
+                background: 'linear-gradient(135deg, ' + b.color + ', ' + b.color + '88)',
               <div style="font-size:12px;color:#909399">{{ b.desc }}</div>
             </div>
           </div>
-        </div>
-
+              <div style="font-size:13px;color:#606266;font-weight:600">{{ b.label }}</div>
+              <div style="font-size:12px;color:#909399">{{ b.desc }}</div>
         <el-divider content-position="left">🏆 学生个人平均分排名 TOP 10</el-divider>
         <div class="panel">
           <el-table :data="studentRank" border stripe style="width:100%">
@@ -420,27 +416,27 @@
               <div style="font-size:13px;color:#606266;margin-bottom:6px">不及格记录</div>
               <div style="font-size:28px;font-weight:700;color:#f56c6c">{{ failingScores.length }}</div>
             </div>
-          </el-col>
-          <el-col :span="6">
-            <div style="background:linear-gradient(135deg,#fef4e6,#fde8cd);padding:20px;border-radius:12px">
+            <div style="background:linear-gradient(135deg,#fef0f0,#fde2e2);padding:20px;border-radius:12px">
+              <div style="font-size:13px;color:#606266;margin-bottom:6px">不及格记录</div>
+              <div style="font-size:28px;font-weight:700;color:#f56c6c">{{ failingScores.length }}</div>
               <div style="font-size:13px;color:#606266;margin-bottom:6px">预警学生</div>
               <div style="font-size:28px;font-weight:700;color:#e6a23c">{{ failingStudents.length }}</div>
             </div>
-          </el-col>
-          <el-col :span="6">
-            <div style="background:linear-gradient(135deg,#e8f1fb,#dbe9fb);padding:20px;border-radius:12px">
+            <div style="background:linear-gradient(135deg,#fef4e6,#fde8cd);padding:20px;border-radius:12px">
+              <div style="font-size:13px;color:#606266;margin-bottom:6px">预警学生</div>
+              <div style="font-size:28px;font-weight:700;color:#e6a23c">{{ failingStudents.length }}</div>
               <div style="font-size:13px;color:#606266;margin-bottom:6px">严重预警 (≥2门)</div>
               <div style="font-size:28px;font-weight:700;color:#303133">{{ seriousStudents.length }}</div>
             </div>
-          </el-col>
-          <el-col :span="6">
-            <div style="background:linear-gradient(135deg,#e6f9f7,#d9f2e6);padding:20px;border-radius:12px">
+            <div style="background:linear-gradient(135deg,#e8f1fb,#dbe9fb);padding:20px;border-radius:12px">
+              <div style="font-size:13px;color:#606266;margin-bottom:6px">严重预警 (≥2门)</div>
+              <div style="font-size:28px;font-weight:700;color:#303133">{{ seriousStudents.length }}</div>
               <div style="font-size:13px;color:#606266;margin-bottom:6px">预警课程数</div>
               <div style="font-size:28px;font-weight:700;color:#67c23a">{{ failingCourses.length }}</div>
             </div>
-          </el-col>
-        </el-row>
-
+            <div style="background:linear-gradient(135deg,#e6f9f7,#d9f2e6);padding:20px;border-radius:12px">
+              <div style="font-size:13px;color:#606266;margin-bottom:6px">预警课程数</div>
+              <div style="font-size:28px;font-weight:700;color:#67c23a">{{ failingCourses.length }}</div>
         <el-divider content-position="left">🔴 不及格成绩明细</el-divider>
         <div class="panel">
           <el-table :data="failingScores" border stripe style="width:100%">

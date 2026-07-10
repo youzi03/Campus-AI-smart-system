@@ -124,12 +124,6 @@
     },
     created() { this.load(); },
     methods: {
-      async load() {
-        try {
-          this.books = await LibraryService.getBooks();
-          this.borrows = await LibraryService.getBorrows();
-        } catch(e) { console.error(e); }
-      },
       openAdd() {
         this.dialog.mode = 'add';
         this.form = { id: '', isbn: '', title: '', author: '', publisher: '', category: '计算机', pubYear: 2023, total: 5, available: 5, price: 49.0, location: '' };
@@ -169,9 +163,13 @@
             <div class="page-desc">管理图书馆图书的借阅、续借与归还</div>
           </div>
           <el-button type="primary" @click="openBorrow">+ 办理借阅</el-button>
-        </div>
+            <div class="page-title">📖 借阅管理</div>
 
         <el-row :gutter="16" style="margin-bottom:20px">
+          <el-col :span="6"><div style="background:linear-gradient(135deg,#e8f1fb,#dbe9fb);padding:20px;border-radius:12px">
+            <div style="font-size:13px;color:#606266">总借阅记录</div>
+            <div style="font-size:28px;font-weight:700;color:#303133">{{ borrows.length }}</div>
+          </div></el-col>
           <el-col :span="6"><div style="background:linear-gradient(135deg,#e8f1fb,#dbe9fb);padding:20px;border-radius:12px">
             <div style="font-size:13px;color:#606266">总借阅记录</div>
             <div style="font-size:28px;font-weight:700;color:#303133">{{ borrows.length }}</div>
@@ -187,10 +185,6 @@
           <el-col :span="6"><div style="background:linear-gradient(135deg,#f5f0ff,#e8dbf5);padding:20px;border-radius:12px">
             <div style="font-size:13px;color:#606266">已归还</div>
             <div style="font-size:28px;font-weight:700;color:#8b5cf6">{{ returnedCount }}</div>
-          </div></el-col>
-        </el-row>
-
-        <div class="panel">
           <div style="display:flex;gap:12px;margin-bottom:16px;align-items:center">
             <el-input v-model="filter.keyword" placeholder="学生姓名/书名" clearable style="width:260px" />
             <el-select v-model="filter.status" placeholder="全部状态" clearable style="width:140px">
@@ -280,13 +274,9 @@
           this.students = await UserService.getStudents();
         } catch(e) { console.error(e); }
       },
-      openBorrow() {
+      async openBorrow() {
         this.form = { studentId: '', studentName: '', bookId: '', bookTitle: '', borrowDate: Common.today(), remark: '' };
         this.dialog.show = true;
-      },
-      onStudentChange(id) { const s = this.students.find(x => x.id === id); if (s) this.form.studentName = s.name; },
-      onBookChange(id) { const b = this.books.find(x => x.id === id); if (b) this.form.bookTitle = b.title; },
-      async submitBorrow() {
         if (!this.form.studentId || !this.form.bookId) { Common.showMsg('请选择学生和书籍', 'warning'); return; }
         await LibraryService.borrowBook(this.form);
         await this.load(); this.dialog.show = false;

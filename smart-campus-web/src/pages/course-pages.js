@@ -15,6 +15,7 @@
             <div class="page-title">课程管理</div>
             <div class="page-desc">维护全校课程信息，包含任课教师、学分、学时、开课学院等</div>
           </div>
+          <el-button type="danger" plain @click="batchDelete" :disabled="selectedIds.length===0">🗑 批量删除 ({{ selectedIds.length }})</el-button>
           <el-button type="primary" @click="openAdd">+ 新增课程</el-button>
         </div>
         <div class="panel">
@@ -24,7 +25,8 @@
               <el-option v-for="c in collegeOptions" :key="c" :label="c" :value="c" />
             </el-select>
           </div>
-          <el-table :data="filteredList" border stripe style="width:100%">
+          <el-table :data="filteredList" border stripe style="width:100%" ref="tableRef" @selection-change="onSelectionChange">
+            <el-table-column type="selection" width="50" />
             <el-table-column prop="id" label="课程编号" width="110" />
             <el-table-column prop="name" label="课程名称" width="180" />
             <el-table-column prop="teacher" label="任课教师" width="100" />
@@ -76,6 +78,7 @@
         teachers: [],
         collegeOptions: UserService.collegeOptions,
         filter: { keyword: '', college: '' },
+        selectedIds: [],
         dialog: { show: false, mode: 'add' },
         form: { id: '', name: '', teacher: '', college: '', credit: 3, hours: 48, capacity: 60, semester: '2025-2026春' }
       };
@@ -122,6 +125,22 @@
         try {
           await ElementPlus.ElMessageBox.confirm('确定删除【' + row.name + '】？', '删除确认', { type: 'warning' });
           await CourseService.deleteCourse(row.id);
+          await this.load();
+        } catch {}
+      },
+      onSelectionChange(rows) {
+        this.selectedIds = rows.map(r => r.id);
+      },
+      async batchDelete() {
+        if (this.selectedIds.length === 0) { Common.showMsg('请先选择课程', 'warning'); return; }
+        try {
+          await ElementPlus.ElMessageBox.confirm('确定批量删除 ' + this.selectedIds.length + ' 门课程？关联的课表和成绩也将被清理。', '批量删除', { type: 'warning' });
+          const count = this.selectedIds.length;
+          for (const id of this.selectedIds) {
+            await CourseService.deleteCourse(id);
+          }
+          this.selectedIds = [];
+          Common.showMsg('已删除 ' + count + ' 门课程');
           await this.load();
         } catch {}
       }
@@ -381,6 +400,7 @@
           <div style="display:flex;gap:10px">
             <el-button type="success" plain @click="autoArrange">🤖 一键智能排课</el-button>
             <el-button type="danger" plain @click="confirmClear">🗑 清空课表</el-button>
+            <el-button type="warning" plain @click="batchCancel" :disabled="selectedIds.length===0">📋 批量取消 ({{ selectedIds.length }})</el-button>
             <el-button type="primary" @click="openAdd">+ 新增教学任务</el-button>
           </div>
         </div>
@@ -391,7 +411,8 @@
               <el-option v-for="(d,i) in dayNames" :key="d" :label="d" :value="i+1" />
             </el-select>
           </div>
-          <el-table :data="filteredList" border stripe style="width:100%">
+          <el-table :data="filteredList" border stripe style="width:100%" ref="tableRef" @selection-change="onSelectionChange">
+            <el-table-column type="selection" width="50" />
             <el-table-column prop="courseName" label="课程" width="160" />
             <el-table-column prop="teacherName" label="任课教师" width="110" />
             <el-table-column label="时间" width="180">
@@ -466,9 +487,10 @@
         periodNames: CourseService.periodNames,
         colorPalette: CourseService.colorPalette,
         filter: { keyword: '', day: '' },
+        selectedIds: [],
         dialog: { show: false, mode: 'add' },
-        weekOptions: ['1-8周','1-9周','1-10周','1-11周','1-12周','1-13周','1-14周','1-15周','1-16周','1-17周','1-18周','2-17周','3-18周','9-16周'],
-        form: { id: '', courseId: '', courseName: '', teacherId: '', teacherName: '', day: 1, period: 1, roomId: '', roomName: '', classGroup: '', week: '1-16周', color: 'blue' }
+        weekOptions: Array.from({length:16},function(_,i){return '第'+(i+1)+'周';}),
+        form: { id: '', courseId: '', courseName: '', teacherId: '', teacherName: '', day: 1, period: 1, roomId: '', roomName: '', classGroup: '', week: '第1周', color: 'blue' }
       };
     },
     computed: {
@@ -522,11 +544,27 @@
           await this.load();
         } catch {}
       },
-      async autoArrange() { CourseService.autoArrange(); await this.load(); },
+      onSelectionChange(rows) {
+        this.selectedIds = rows.map(r => r.id);
+      },
+      async batchCancel() {
+        if (this.selectedIds.length === 0) { Common.showMsg('请先选择教学任务', 'warning'); return; }
+        try {
+          await ElementPlus.ElMessageBox.confirm('确定批量取消 ' + this.selectedIds.length + ' 条教学任务？', '批量取消', { type: 'warning' });
+          const count = this.selectedIds.length;
+          for (const id of this.selectedIds) {
+            await CourseService.deleteScheduleItem(id);
+          }
+          this.selectedIds = [];
+          Common.showMsg('已取消 ' + count + ' 条');
+          await this.load();
+        } catch {}
+      },
+      async autoArrange() { await CourseService.autoArrange(); await this.load(); },
       async confirmClear() {
         try {
           await ElementPlus.ElMessageBox.confirm('将清空所有排课，确认继续？', '确认', { type: 'warning' });
-          CourseService.clearSchedule();
+          await CourseService.clearSchedule();
           await this.load();
         } catch {}
       }
@@ -554,29 +592,28 @@
           </div>
         </div>
 
-        <div v-if="viewMode==='grid'" class="panel">
-          <table class="schedule-table" style="width:100%;border-collapse:separate;border-spacing:1px;background:#ebeef5;border-radius:8px;overflow:hidden">
+        <div v-if="viewMode==='grid'" class="panel" style="padding:8px">
+          <table class="schedule-table" style="width:100%;border-collapse:separate;border-spacing:1px;background:#ebeef5;border-radius:6px;overflow:hidden;table-layout:fixed">
             <thead>
               <tr>
-                <th style="background:#f5f8fb;padding:14px 8px;width:140px;font-weight:600;color:#303133">时间</th>
-                <th v-for="d in dayNames" :key="d" style="background:#f5f8fb;padding:14px 8px;font-weight:600;color:#303133">{{ d }}</th>
+                <th style="background:#f5f8fb;padding:4px 2px;width:55px;font-weight:600;font-size:11px;color:#303133">时间</th>
+                <th v-for="d in dayNames" :key="d" style="background:#f5f8fb;padding:4px 2px;font-weight:600;font-size:11px;color:#303133">{{ d }}</th>
               </tr>
             </thead>
             <tbody>
               <tr v-for="p in periodNames" :key="p.p">
-                <td style="background:#fff;padding:12px 8px;text-align:center">
-                  <div style="font-weight:600;color:#3a7bd5">{{ p.name }}</div>
-                  <div style="font-size:12px;color:#909399;margin-top:4px">{{ p.time }}</div>
+                <td style="background:#fff;padding:2px;text-align:center;vertical-align:middle">
+                  <div style="font-weight:600;font-size:10px;color:#3a7bd5;line-height:1.2">{{ p.name.substring(0,4) }}</div>
+                  <div style="font-size:9px;color:#909399;line-height:1.1">{{ p.time }}</div>
                 </td>
-                <td v-for="(d,di) in dayNames" :key="d" style="background:#fff;padding:6px;vertical-align:top">
+                <td v-for="(d,di) in dayNames" :key="d" style="background:#fff;padding:1px;vertical-align:top">
                   <div v-for="item in filteredItemsAt(di+1, p.p)" :key="item.id"
                        @click="showDetail(item)"
-                       style="padding:10px 12px;border-radius:8px;margin-bottom:6px;cursor:pointer;transition:all 0.2s"
-                       :style="{background:colorBg(item.color), color:colorText(item.color), borderLeft: '3px solid ' + colorHex(item.color)}">
-                    <div style="font-weight:600;font-size:13px">{{ item.courseName }}</div>
-                    <div style="font-size:12px;opacity:.85;margin-top:4px">👨‍🏫 {{ item.teacherName }}</div>
-                    <div style="font-size:12px;opacity:.85">📍 {{ item.roomName }}</div>
-                    <div style="font-size:11px;opacity:.7;margin-top:3px">{{ item.classGroup }} · {{ item.week }}</div>
+                       style="padding:2px 4px;border-radius:3px;margin-bottom:1px;cursor:pointer;font-size:9px;line-height:1.25"
+                       :style="{background:colorBg(item.color), color:colorText(item.color), borderLeft: '2px solid ' + colorHex(item.color)}">
+                    <div style="font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ item.courseName }}</div>
+                    <div style="opacity:.8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ item.teacherName }}</div>
+                    <div style="opacity:.65;font-size:8px">{{ item.week }}</div>
                   </div>
                 </td>
               </tr>
@@ -602,21 +639,46 @@
       </div>
     `,
     data() {
+      var user = (window.Auth && window.Auth.getUser()) || {};
       return {
         list: [],
-        selectedWeek: '',
-        weekOptions: Array.from({length:18},(_,i)=>{return '第'+(i+1)+'周';}),
+        user: user,
+        selectedWeek: '第1周',
+        weekOptions: Array.from({length:16},function(_,i){return '第'+(i+1)+'周';}),
         dayNames: CourseService.dayNames,
         periodNames: CourseService.periodNames,
         viewMode: 'grid'
       };
     },
     computed: {
+      myList() {
+        var self = this;
+        var role = this.user.role;
+        if (role === 'admin' || !role) return this.list;
+        var commonCourses = ['MA201','MA202','EN101','EN102','PH101'];
+        var college = (this.user.profile && this.user.profile.college) || '';
+        if (role === 'teacher') {
+          var teacherId = this.user.username || '';
+          return this.list.filter(function(s) {
+            return s.teacherId === teacherId;
+          });
+        }
+        if (role === 'student') {
+          // 学院→班级前缀映射
+          var collegeToClass = {'计算机学院':'计科','数学学院':'数学','外语学院':'英语','物理学院':'物理','经济学院':'经济'};
+          var classPrefix = collegeToClass[college] || '';
+          return this.list.filter(function(s) {
+            if (commonCourses.indexOf(s.courseId) >= 0) return true;
+            return s.classGroup && classPrefix && s.classGroup.indexOf(classPrefix) === 0;
+          });
+        }
+        return this.list;
+      },
       filteredList() {
-        if (!this.selectedWeek) return this.list;
-        return this.list.filter(s => {
+        if (!this.selectedWeek) return this.myList;
+        return this.myList.filter(function(s) {
           if (s.week === this.selectedWeek) return true;
-          var wk = this.selectedWeek.match(/^(\d+)周$/);
+          var wk = this.selectedWeek.match(/^第(\d+)周$/);
           if (wk) {
             var m = s.week.match(/^(\d+)-(\d+)周$/);
             if (m) {
@@ -625,28 +687,42 @@
             }
           }
           return false;
-        });
+        }.bind(this));
       },
-      sortedList() { return [...this.list].sort((a, b) => a.day - b.day || a.period - b.period); },
-      sortedFilteredList() { return [...this.filteredList].sort((a, b) => a.day - b.day || a.period - b.period); }
+      sortedList() { return [].concat(this.list).sort(function(a, b) { return a.day - b.day || a.period - b.period; }); },
+      sortedFilteredList() { return [].concat(this.filteredList).sort(function(a, b) { return a.day - b.day || a.period - b.period; }); }
     },
     created() { this.load(); },
     methods: {
       async load() { this.list = await CourseService.getSchedule(); },
-      itemsAt(day, period) { return this.list.filter(s => s.day === day && s.period === period); },
-      filteredItemsAt(day, period) { return this.filteredList.filter(s => s.day === day && s.period === period); },
+      _courseBelongsToCollege(courseId, college) {
+        var map = {
+          '计算机学院': ['CS'],
+          '数学学院': ['MA'],
+          '外语学院': ['EN'],
+          '物理学院': ['PH'],
+          '经济学院': ['EC'],
+          '化学学院': ['CH'],
+          '机械学院': ['ME'],
+          '艺术学院': ['AR']
+        };
+        var prefixes = map[college] || [];
+        return prefixes.some(function(p) { return courseId.indexOf(p) === 0; });
+      },
+      itemsAt(day, period) { return this.list.filter(function(s) { return s.day === day && s.period === period; }); },
+      filteredItemsAt(day, period) { return this.filteredList.filter(function(s) { return s.day === day && s.period === period; }); },
       colorHex(c) { return { blue: '#409eff', green: '#67c23a', orange: '#e6a23c', purple: '#8b5cf6', pink: '#ec4899' }[c] || '#409eff'; },
       colorBg(c) {
-        const map = { blue: '#ecf5ff', green: '#f0f9eb', orange: '#fdf6ec', purple: '#f5f0ff', pink: '#fef0f5' };
+        var map = { blue: '#ecf5ff', green: '#f0f9eb', orange: '#fdf6ec', purple: '#f5f0ff', pink: '#fef0f5' };
         return map[c] || '#ecf5ff';
       },
       colorText(c) {
-        const map = { blue: '#2d69b3', green: '#4a8a2b', orange: '#b8821a', purple: '#6b4aa0', pink: '#b8447a' };
+        var map = { blue: '#2d69b3', green: '#4a8a2b', orange: '#b8821a', purple: '#6b4aa0', pink: '#b8447a' };
         return map[c] || '#303133';
       },
       showDetail(item) {
         ElementPlus.ElMessageBox.alert(
-          '课程：' + item.courseName + '\n教师：' + item.teacherName + '\n地点：' + item.roomName + '\n时间：' + CourseService.dayNames[item.day-1] + ' ' + CourseService.periodNames.find(p=>p.p===item.period).name + '\n班级：' + item.classGroup + '\n周次：' + item.week,
+          '课程：' + item.courseName + '\n教师：' + item.teacherName + '\n地点：' + item.roomName + '\n时间：' + CourseService.dayNames[item.day-1] + ' ' + CourseService.periodNames.find(function(p){return p.p===item.period;}).name + '\n班级：' + item.classGroup + '\n周次：' + item.week,
           '课程详情', { type: 'info' }
         );
       }

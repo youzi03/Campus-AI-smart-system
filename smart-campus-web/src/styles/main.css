@@ -160,26 +160,58 @@ html, body, #app {
 }
 
 /* ========== Element Plus 组件定制 ========== */
-:deep(.el-table) {
+.el-table {
   font-size: 13px;
   border-radius: var(--radius-md);
   overflow: hidden;
+  background: var(--color-bg-card) !important;
+  border: 1px solid var(--color-border) !important;
 }
 
-:deep(.el-table th.el-table__cell) {
-  background: #f8fafc !important;
+.el-table th.el-table__cell {
+  background: linear-gradient(135deg, rgba(0, 47, 167, 0.2) 0%, rgba(0, 47, 167, 0.08) 100%) !important;
   color: var(--color-text-main) !important;
   font-weight: 600;
   font-size: 12.5px;
   letter-spacing: 0.3px;
+  border-bottom: 1px solid var(--color-border) !important;
 }
 
-:deep(.el-table--border::after),
-:deep(.el-table::before) {
-  background: var(--color-border-light) !important;
+.el-table td.el-table__cell {
+  color: var(--color-text-regular) !important;
+  border-bottom: 1px solid var(--color-border-light) !important;
 }
 
-:deep(.el-button--primary) {
+.el-table--border td.el-table__cell {
+  border-right: 1px solid var(--color-border-light) !important;
+}
+
+.el-table--border th.el-table__cell {
+  border-right: 1px solid var(--color-border) !important;
+}
+
+.el-table--border::after,
+.el-table::before {
+  background: transparent !important;
+}
+
+.el-table__inner-wrapper::after {
+  background: transparent !important;
+}
+
+.el-table tr:hover > td {
+  background: rgba(0, 47, 167, 0.12) !important;
+}
+
+.el-table__body tr.el-table__row {
+  background: var(--color-bg-card) !important;
+}
+
+.el-table--striped .el-table__body tr.el-table__row--striped {
+  background: rgba(0, 47, 167, 0.06) !important;
+}
+
+.el-button--primary{
   background: var(--color-primary-gradient);
   border: none;
   border-radius: 8px;
@@ -187,81 +219,81 @@ html, body, #app {
   transition: all 0.2s ease;
 }
 
-:deep(.el-button--primary:hover) {
+.el-button--primary:hover{
   background: linear-gradient(135deg, var(--color-primary-dark), var(--color-primary));
   box-shadow: 0 4px 12px rgba(79, 110, 247, 0.35);
   transform: translateY(-1px);
 }
 
-:deep(.el-button--default) {
+.el-button--default{
   border-radius: 8px;
   font-weight: 500;
 }
 
-:deep(.el-input__wrapper) {
+.el-input__wrapper{
   border-radius: 8px;
   box-shadow: 0 0 0 1px var(--color-border) inset;
   transition: box-shadow 0.2s ease;
 }
 
-:deep(.el-input__wrapper.is-focus) {
+.el-input__wrapper.is-focus{
   box-shadow: 0 0 0 2px var(--color-primary) inset;
 }
 
-:deep(.el-input__wrapper:hover) {
+.el-input__wrapper:hover{
   box-shadow: 0 0 0 1px var(--color-primary) inset;
 }
 
-:deep(.el-select .el-input__wrapper) {
+.el-select .el-input__wrapper{
   border-radius: 8px;
 }
 
-:deep(.el-dialog) {
+.el-dialog{
   border-radius: 16px;
   overflow: hidden;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12);
 }
 
-:deep(.el-dialog__header) {
+.el-dialog__header{
   padding: 20px 24px;
   border-bottom: 1px solid var(--color-border-light);
 }
 
-:deep(.el-dialog__body) {
+.el-dialog__body{
   padding: 24px;
 }
 
-:deep(.el-dialog__footer) {
+.el-dialog__footer{
   padding: 16px 24px 20px;
   border-top: 1px solid var(--color-border-light);
 }
 
-:deep(.el-tag) {
+.el-tag{
   border-radius: 6px;
   border: none;
   font-weight: 500;
 }
 
-:deep(.el-divider__text) {
+.el-divider__text{
   color: var(--color-text-secondary);
   font-size: 13px;
   font-weight: 600;
 }
 
-:deep(.el-pagination) {
+.el-pagination{
   font-weight: 400;
 }
 
-:deep(.el-pagination button:hover) {
+.el-pagination button:hover{
   color: var(--color-primary);
 }
 
-:deep(.el-pager li.active) {
+.el-pager li.active{
   color: var(--color-primary);
   font-weight: 700;
 }
 
-:deep(.el-menu--vertical) {
+.el-menu--vertical{
   border-right: none !important;
 }
 
@@ -277,7 +309,7 @@ html, body, #app {
 }
 
 .schedule-table th {
-  background: #f8fafc;
+  background: linear-gradient(135deg, rgba(0, 47, 167, 0.15) 0%, rgba(0, 47, 167, 0.05) 100%);
   color: var(--color-text-main);
   padding: 10px 8px;
   font-weight: 600;
@@ -286,7 +318,7 @@ html, body, #app {
 }
 
 .schedule-table td {
-  background: #fff;
+  background: var(--color-bg-card);
   padding: 8px;
   vertical-align: top;
   min-height: 72px;

@@ -215,10 +215,7 @@
     },
     created() { this.load(); },
     methods: {
-      getOccupancy(id) { return DormService.getRoomOccupancy(id); },
       async load() {
-        this.rooms = await DormService.getRooms();
-        this.allocs = await DormService.getAllocations();
         this.students = await UserService.getStudents();
         this.buildingStats = await DormService.getBuildingStats();
       },
